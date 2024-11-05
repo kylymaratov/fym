@@ -27,9 +27,14 @@ import { LikeSongDto } from './dto/like.dto';
 export class SongController {
   constructor(private readonly songService: SongService) {}
 
+  @Get('top')
+  getTopSongs() {
+    return this.songService.getTopSongs();
+  }
+
   @Get('listen')
   @HttpCode(206)
-  async listen(
+  async listenSong(
     @Query() query: ListenSongDto,
     @Req() req: Request,
     @Res() res: Response,
@@ -57,14 +62,14 @@ export class SongController {
   }
   @Post('search')
   @HttpCode(200)
-  search(@Body() body: SearchSongsDto) {
+  searchSongs(@Body() body: SearchSongsDto) {
     return this.songService.search(body);
   }
 
   @Put('like')
   @UseGuards(ApiAuthGuard)
   @HttpCode(200)
-  like(@CurrentUser() user: UserEntity, @Query() query: LikeSongDto) {
+  likeSong(@CurrentUser() user: UserEntity, @Query() query: LikeSongDto) {
     const { songId } = query;
     return this.songService.like(user, songId);
   }

@@ -45,7 +45,7 @@ export class SongEntity {
   @Column({ default: false })
   is_downloading: boolean;
 
-  @OneToMany(() => SongLikeEntity, (song_like) => song_like.user)
+  @OneToMany(() => SongLikeEntity, (song_like) => song_like.song)
   song_likes: SongLikeEntity[];
 
   @JoinColumn()

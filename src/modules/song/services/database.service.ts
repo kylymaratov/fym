@@ -97,6 +97,37 @@ export class SongDatabaseService {
     await this.songRepository.save(song);
   }
 
+  async getTopSongs(limit: number = 20): Promise<SongEntity[]> {
+    const rawSongs = await this.songRepository
+      .createQueryBuilder('song')
+      .leftJoin('song.song_likes', 'like')
+      .select([
+        'song.id AS id',
+        'song.sourceId AS sourceId',
+        'song.original_title AS original_title',
+        'song.title AS title',
+        'song.author AS author',
+        'song.artist AS artist',
+        'song.duration AS duration',
+        'song.is_official AS is_official',
+        'song.upload_date AS upload_date',
+        'song.is_downloading AS is_downloading',
+        'song.created AS created',
+        'song.updated AS updated',
+      ])
+      .addSelect('COUNT(like.id)', 'like_count')
+      .groupBy('song.id')
+      .addGroupBy('song.sourceId')
+      .orderBy('like_count', 'DESC')
+      .limit(limit)
+      .getRawMany();
+
+    return rawSongs.map((song) => ({
+      ...song,
+      like_count: parseInt(song.like_count),
+    }));
+  }
+
   private async cleanOldCachedSongs() {
     try {
       const totalCacheSize = await this.songCacheRepository
