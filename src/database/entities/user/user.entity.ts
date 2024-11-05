@@ -3,12 +3,14 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { UserInfoEntity } from './user.info.entity';
+import { SongLikeEntity } from '../song/song.like.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -23,6 +25,9 @@ export class UserEntity {
 
   @Column({ default: false })
   verified: boolean;
+
+  @OneToMany(() => SongLikeEntity, (song_like) => song_like.user)
+  song_likes: SongLikeEntity[];
 
   @JoinColumn()
   @OneToOne(() => UserInfoEntity, (userInfo) => userInfo.user, {

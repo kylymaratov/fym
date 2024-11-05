@@ -10,10 +10,16 @@ import { SongEntity } from 'src/database/entities/song/song.entity';
 import { SongCacheEntity } from 'src/database/entities/song/song.cache.entity';
 import { SongMetadataEntity } from 'src/database/entities/song/song.metadata.entity';
 import { ConvertUtil } from 'src/utils/convert.util';
+import { SongLikeEntity } from 'src/database/entities/song/song.like.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([SongEntity, SongCacheEntity, SongMetadataEntity]),
+    TypeOrmModule.forFeature([
+      SongEntity,
+      SongCacheEntity,
+      SongMetadataEntity,
+      SongLikeEntity,
+    ]),
   ],
   controllers: [SongController],
   providers: [

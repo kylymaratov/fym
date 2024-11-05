@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryColumn,
   PrimaryGeneratedColumn,
@@ -10,6 +11,7 @@ import {
 } from 'typeorm';
 import { SongCacheEntity } from './song.cache.entity';
 import { SongMetadataEntity } from './song.metadata.entity';
+import { SongLikeEntity } from './song.like.entity';
 
 @Entity({ name: 'songs' })
 export class SongEntity {
@@ -42,6 +44,9 @@ export class SongEntity {
 
   @Column({ default: false })
   is_downloading: boolean;
+
+  @OneToMany(() => SongLikeEntity, (song_like) => song_like.user)
+  song_likes: SongLikeEntity[];
 
   @JoinColumn()
   @OneToOne(() => SongCacheEntity, (cache) => cache.song, {

@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   Post,
+  Put,
   Query,
   Req,
   Res,
@@ -17,6 +18,9 @@ import { ListenSongDto } from './dto/listen.dto';
 import { Request, Response } from 'express';
 import { Readable } from 'stream';
 import { SearchSongsDto } from './dto/search.dto';
+import { CurrentUser } from 'src/decorators/user.decorator';
+import { UserEntity } from 'src/database/entities/user/user.entity';
+import { LikeSongDto } from './dto/like.dto';
 
 @ApiTags('song')
 @Controller(`/api/${serverEnv.sv}/song`)
@@ -53,7 +57,15 @@ export class SongController {
   }
   @Post('search')
   @HttpCode(200)
-  searchSong(@Body() body: SearchSongsDto) {
+  search(@Body() body: SearchSongsDto) {
     return this.songService.search(body);
+  }
+
+  @Put('like')
+  @UseGuards(ApiAuthGuard)
+  @HttpCode(200)
+  like(@CurrentUser() user: UserEntity, @Query() query: LikeSongDto) {
+    const { songId } = query;
+    return this.songService.like(user, songId);
   }
 }

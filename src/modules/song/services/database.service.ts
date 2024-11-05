@@ -5,6 +5,8 @@ import { SongEntity } from 'src/database/entities/song/song.entity';
 import { SongMetadataEntity } from 'src/database/entities/song/song.metadata.entity';
 import { Repository } from 'typeorm';
 import { TSong } from '../types/song.types';
+import { UserEntity } from 'src/database/entities/user/user.entity';
+import { SongLikeEntity } from 'src/database/entities/song/song.like.entity';
 
 @Injectable()
 export class SongDatabaseService {
@@ -17,6 +19,8 @@ export class SongDatabaseService {
     private songCacheRepository: Repository<SongCacheEntity>,
     @InjectRepository(SongMetadataEntity)
     private songMetadataRepository: Repository<SongMetadataEntity>,
+    @InjectRepository(SongLikeEntity)
+    private songLikeRepository: Repository<SongLikeEntity>,
   ) {}
 
   async findBySourceId(sourceId: string, relations: string[] = []) {
@@ -26,13 +30,30 @@ export class SongDatabaseService {
     });
   }
 
+  async likeSong(user: UserEntity, song: SongEntity) {
+    const like = await this.songLikeRepository.findOne({
+      where: { user: { id: user.id }, song: { id: song.id } },
+    });
+
+    if (like) {
+      await this.songLikeRepository.remove(like);
+      return false;
+    }
+
+    const new_like = this.songLikeRepository.create({ user, song });
+
+    await this.songLikeRepository.save(new_like);
+
+    return true;
+  }
+
   async saveNewSong(song: TSong): Promise<void> {
     try {
-      const extSong = await this.songRepository.findOne({
+      const ext_song = await this.songRepository.findOne({
         where: { sourceId: song.sourceId },
       });
 
-      if (extSong) return;
+      if (ext_song) return;
 
       const newSong = this.songRepository.create(song);
 

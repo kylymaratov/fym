@@ -10,6 +10,7 @@ import { SearchSongsDto } from './dto/search.dto';
 import { ListenSongDto } from './dto/listen.dto';
 import { SongDatabaseService } from './services/database.service';
 import { SongDownloadService } from './services/download.service';
+import { UserEntity } from 'src/database/entities/user/user.entity';
 
 @Injectable()
 export class SongService {
@@ -60,5 +61,15 @@ export class SongService {
     );
 
     return { buffer, metadata };
+  }
+
+  async like(user: UserEntity, songId: string) {
+    const song = await this.songDatabaseService.findBySourceId(songId);
+
+    if (!song) throw new NotFoundException('Song not found in database');
+
+    const liked = await this.songDatabaseService.likeSong(user, song);
+
+    return { message: 'OK', liked };
   }
 }
