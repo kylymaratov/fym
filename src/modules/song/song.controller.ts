@@ -32,6 +32,12 @@ export class SongController {
     return this.songService.getTopSongs();
   }
 
+  @Get('token')
+  getTempToken(@CurrentUser() user: UserEntity) {
+    return this.songService.getTempToken(user);
+  }
+
+  @UseGuards(ApiAuthGuard)
   @Get('listen')
   @HttpCode(206)
   async listenSong(

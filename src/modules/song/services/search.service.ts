@@ -8,7 +8,7 @@ import { REXEGP } from 'src/constants/regexp';
 
 @Injectable()
 export class SongSearchService {
-  private readonly maxSongDuration: number = 10000;
+  private readonly MAX_SONG_DURATION: number = 700;
   private readonly client: Client = new Client();
 
   constructor(
@@ -42,7 +42,7 @@ export class SongSearchService {
 
   private songCheck(video: VideoCompact | Video) {
     const checkDuration = (): boolean => {
-      return video.duration <= this.maxSongDuration;
+      return video.duration <= this.MAX_SONG_DURATION;
     };
 
     const checkByTitle = (): boolean => {

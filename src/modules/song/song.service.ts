@@ -72,9 +72,12 @@ export class SongService {
 
     return { message: 'OK', liked };
   }
+
   async getTopSongs() {
     const result = await this.songDatabaseService.getTopSongs();
 
-    return result;
+    return { title: 'Top Songs', data: result };
   }
+
+  async getTempToken(user: UserEntity) {}
 }
