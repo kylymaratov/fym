@@ -63,6 +63,12 @@ export class SongService {
     return { buffer, metadata };
   }
 
+  async icnListenCount(songId: string) {
+    try {
+      await this.songDatabaseService.incListenCount(songId);
+    } catch {}
+  }
+
   async like(user: UserEntity, songId: string) {
     const song = await this.songDatabaseService.findBySourceId(songId);
 
@@ -74,9 +80,15 @@ export class SongService {
   }
 
   async getTopSongs() {
-    const result = await this.songDatabaseService.getTopSongs();
+    const result = await this.songDatabaseService.findTopSongs();
 
     return { title: 'Top Songs', data: result };
+  }
+
+  async getTopListenedSongs() {
+    const result = await this.songDatabaseService.findTopListenedSongs();
+
+    return { title: 'Top listened songs', data: result };
   }
 
   async getTempToken(user: UserEntity) {}

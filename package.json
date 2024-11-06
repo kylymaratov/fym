@@ -1,14 +1,15 @@
 {
   "name": "songfiy-api",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Music streaming service, for free and without borders",
+  "author": "Kylym",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "cross-env NODE_ENV=production nest start",
+    "backup": "node ./backup/backup.js",
     "start:dev": "cross-env NODE_ENV=development nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",

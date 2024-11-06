@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { UserInfoEntity } from './user.info.entity';
 import { SongLikeEntity } from '../song/song.like.entity';
+// import { RecentlyPlayedEntity } from '../recently/recently.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -28,6 +29,9 @@ export class UserEntity {
 
   @OneToMany(() => SongLikeEntity, (song_like) => song_like.user)
   song_likes: SongLikeEntity[];
+
+  // @OneToMany(() => RecentlyPlayedEntity, (recently) => recently.user)
+  // recently_played: RecentlyPlayedEntity[];
 
   @JoinColumn()
   @OneToOne(() => UserInfoEntity, (userInfo) => userInfo.user, {

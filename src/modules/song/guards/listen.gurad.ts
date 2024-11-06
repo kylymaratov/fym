@@ -5,6 +5,8 @@ export class ListneSongGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<Request>();
 
+    if (request.isAuthenticated()) return true;
+
     return true;
   }
 }

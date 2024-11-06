@@ -10,6 +10,20 @@ import { SongLikeEntity } from 'src/database/entities/song/song.like.entity';
 
 @Injectable()
 export class SongDatabaseService {
+  private SONG_FIELDS = [
+    'song.id AS id',
+    'song.sourceId AS sourceId',
+    'song.original_title AS original_title',
+    'song.title AS title',
+    'song.author AS author',
+    'song.artist AS artist',
+    'song.duration AS duration',
+    'song.is_official AS is_official',
+    'song.upload_date AS upload_date',
+    'song.is_downloading AS is_downloading',
+    'song.created AS created',
+    'song.updated AS updated',
+  ];
   private MAX_CACHE_SIZE: number = 1000;
 
   constructor(
@@ -87,6 +101,14 @@ export class SongDatabaseService {
       .execute();
   }
 
+  async incListenCount(songId: string) {
+    await this.songRepository.increment(
+      { sourceId: songId },
+      'listened_count',
+      1,
+    );
+  }
+
   async updateSongMetadata(song: SongEntity, metadata: SongMetadataEntity) {
     const newMetadata = this.songMetadataRepository.create(metadata);
 
@@ -96,25 +118,35 @@ export class SongDatabaseService {
 
     await this.songRepository.save(song);
   }
+  async findTopListenedSongs() {
+    const songs = await this.songRepository
+      .createQueryBuilder('song')
+      .orderBy('listened_count', 'DESC')
+      .getMany();
 
-  async getTopSongs(limit: number = 20): Promise<SongEntity[]> {
-    const rawSongs = await this.songRepository
+    return songs;
+  }
+
+  async findUserLikedSongs(user: UserEntity) {
+    const songs = await this.songRepository
       .createQueryBuilder('song')
       .leftJoin('song.song_likes', 'like')
-      .select([
-        'song.id AS id',
-        'song.sourceId AS sourceId',
-        'song.original_title AS original_title',
-        'song.title AS title',
-        'song.author AS author',
-        'song.artist AS artist',
-        'song.duration AS duration',
-        'song.is_official AS is_official',
-        'song.upload_date AS upload_date',
-        'song.is_downloading AS is_downloading',
-        'song.created AS created',
-        'song.updated AS updated',
-      ])
+      .select(this.SONG_FIELDS)
+      .addSelect('COUNT(like.id)', 'like_count')
+      .where('like.userId = :userId', { userId: user.id })
+      .groupBy('song.id')
+      .addGroupBy('song.sourceId')
+      .orderBy('like_count', 'DESC')
+      .getRawMany();
+
+    return songs;
+  }
+
+  async findTopSongs(limit: number = 20): Promise<SongEntity[]> {
+    const songs = await this.songRepository
+      .createQueryBuilder('song')
+      .leftJoin('song.song_likes', 'like')
+      .select(this.SONG_FIELDS)
       .addSelect('COUNT(like.id)', 'like_count')
       .groupBy('song.id')
       .addGroupBy('song.sourceId')
@@ -122,10 +154,7 @@ export class SongDatabaseService {
       .limit(limit)
       .getRawMany();
 
-    return rawSongs.map((song) => ({
-      ...song,
-      like_count: parseInt(song.like_count),
-    }));
+    return songs;
   }
 
   private async cleanOldCachedSongs() {

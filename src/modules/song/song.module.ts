@@ -30,5 +30,6 @@ import { SongLikeEntity } from 'src/database/entities/song/song.like.entity';
     TelegramBot,
     ConvertUtil,
   ],
+  exports: [SongDatabaseService],
 })
 export class SongModule {}
