@@ -11,7 +11,8 @@ import { URLS } from 'src/constants/urls';
 
 @Injectable()
 export class SongSearchService {
-  private readonly MAX_SONG_DURATION: number = 700;
+  private readonly MAX_SONG_DURATION: number = 300;
+  private readonly MIN_SONG_DURATION: number = 60;
   private readonly client: Client = new Client();
 
   constructor(
@@ -81,7 +82,10 @@ export class SongSearchService {
 
   private relatedSongCheck(video: relatedVideo) {
     const checkDuration = (): boolean => {
-      return video.length_seconds <= this.MAX_SONG_DURATION;
+      return (
+        video.length_seconds <= this.MAX_SONG_DURATION &&
+        video.length_seconds >= this.MIN_SONG_DURATION
+      );
     };
 
     const checkByTitle = (): boolean => {
@@ -113,7 +117,10 @@ export class SongSearchService {
 
   private songCheck(video: VideoCompact | Video) {
     const checkDuration = (): boolean => {
-      return video.duration <= this.MAX_SONG_DURATION;
+      return (
+        video.duration <= this.MAX_SONG_DURATION &&
+        video.duration >= this.MIN_SONG_DURATION
+      );
     };
 
     const checkByTitle = (): boolean => {

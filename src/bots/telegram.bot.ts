@@ -1,11 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { SongEntity } from 'src/database/entities/song/song.entity';
 import { SongMetadataEntity } from 'src/database/entities/song/song.metadata.entity';
 import { serverEnv } from 'src/server/server.env';
 import { ConvertUtil } from 'src/utils/convert.util';
-import { Readable } from 'stream';
-import { Telegraf } from 'telegraf';
+import * as FormData from 'form-data';
 
 @Injectable()
 export class TelegramBot {
@@ -13,76 +12,69 @@ export class TelegramBot {
   private TELEGRAM_CHAT_ID: string = serverEnv.isProd
     ? serverEnv.env.TELEGRAM_CHAT_ID
     : serverEnv.env.TELEGRAM_CHAT_ID;
-  private bot: Telegraf = new Telegraf(this.BOT_TOKEN);
-  private FILE_DOWNLOAD_URL = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/`;
-  private INACTIVITY_TIMER: any;
+  private FILE_DOWNLOAD_URL = `https://api.telegram.org/file/bot${this.BOT_TOKEN}/`;
   private IMAGE_URL = 'https://i3.ytimg.com/vi/';
   private IMAGE_QUALITY = '/hqdefault.jpg';
 
-  constructor(@Inject() private convertUtil: ConvertUtil) {
-    this.bot.on('message', (ctx) => {
-      console.log(ctx.message.chat.id);
-    });
-
-    this.bot.launch();
-  }
+  constructor(private convertUtil: ConvertUtil) {}
 
   async downloadSong(song: SongEntity): Promise<Buffer> {
-    await this.checkConnection();
-
-    const file = await this.bot.telegram.getFile(song.metadata.file_id);
-
+    const file = await this.getFile(song.metadata.file_id);
     const response = await axios.get(this.FILE_DOWNLOAD_URL + file.file_path, {
       responseType: 'arraybuffer',
     });
-
-    const buffer = Buffer.from(response.data);
-
-    return buffer;
+    return Buffer.from(response.data);
   }
 
   async uploadSong(
     song: SongEntity,
     buffer: Buffer,
   ): Promise<SongMetadataEntity> {
-    await this.checkConnection();
-
-    const message = await this.bot.telegram.sendAudio(
-      this.TELEGRAM_CHAT_ID,
-      {
-        source: Readable.from(buffer),
-        filename: this.convertUtil.convertCyrilicLatin(song.original_title),
-      },
-      {
-        title: song.title,
-        performer: song.author,
-        thumbnail: {
-          url: this.IMAGE_URL + song.source_id + this.IMAGE_QUALITY,
-        },
-      },
-    );
-
+    const message = await this.sendAudio(song, buffer);
     const metadata = message.audio as SongMetadataEntity;
-
     return metadata;
   }
 
-  private resetTimer = () => {
-    if (this.INACTIVITY_TIMER) clearTimeout(this.INACTIVITY_TIMER);
-    this.INACTIVITY_TIMER = setTimeout(
-      () => {
-        this.bot.stop();
-      },
-      5 * 60 * 1000,
+  private async getFile(fileId: string) {
+    const response = await axios.post(
+      `https://api.telegram.org/bot${this.BOT_TOKEN}/getFile`,
+      { file_id: fileId },
     );
-  };
+    return response.data.result;
+  }
 
-  private async checkConnection() {
-    try {
-      await this.bot.telegram.getMe();
-    } catch {
-      await this.bot.launch();
-      this.resetTimer();
-    }
+  private async sendAudio(song: SongEntity, buffer: Buffer) {
+    const form = new FormData();
+    form.append('chat_id', this.TELEGRAM_CHAT_ID);
+    form.append('audio', buffer, {
+      filename: this.convertUtil.convertCyrilicLatin(song.original_title),
+      contentType: 'audio/mp3',
+    });
+
+    form.append('title', song.title);
+    form.append('performer', song.author);
+
+    const thumbUrl = this.IMAGE_URL + song.source_id + this.IMAGE_QUALITY;
+    const thumbStream = await this.downloadThumbnail(thumbUrl);
+
+    form.append('thumb', thumbStream, {
+      filename: `${song.title}-thumb`,
+      contentType: 'image/jpeg',
+    });
+
+    const response = await axios.post(
+      `https://api.telegram.org/bot${this.BOT_TOKEN}/sendAudio`,
+      form,
+      {
+        headers: form.getHeaders(),
+      },
+    );
+
+    return response.data.result;
+  }
+
+  private async downloadThumbnail(imageUrl: string) {
+    const response = await axios.get(imageUrl, { responseType: 'stream' });
+    return response.data;
   }
 }

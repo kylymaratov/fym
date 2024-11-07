@@ -39,7 +39,7 @@ export class SongService {
 
     if (song.is_downloading)
       throw new HttpException(
-        { message: 'Try later', ms: 25000 },
+        { message: 'Try later', timeout: 25000 },
         HttpStatus.SERVICE_UNAVAILABLE,
       );
 

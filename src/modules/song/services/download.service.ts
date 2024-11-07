@@ -44,7 +44,7 @@ export class SongDownloadService {
       return { buffer, metadata };
     } catch {
       throw new HttpException(
-        { message: 'Try later', ms: 60000 },
+        { message: 'Try later', timeout: 60000 },
         HttpStatus.SERVICE_UNAVAILABLE,
       );
     } finally {

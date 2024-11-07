@@ -1,6 +1,5 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { SongEntity } from './song.entity';
-import { PhotoSize } from 'telegraf/typings/core/types/typegram';
 
 @Entity({ name: 'song_metadata' })
 export class SongMetadataEntity {
@@ -32,7 +31,13 @@ export class SongMetadataEntity {
   file_size: number;
 
   @Column({ nullable: true, type: 'json' })
-  thumbnail: PhotoSize;
+  thumbnail: {
+    file_id: string;
+    file_unique_id: string;
+    width: number;
+    height: number;
+    file_size?: number;
+  };
 
   @OneToOne(() => SongEntity, (song) => song.metadata)
   song: SongEntity;

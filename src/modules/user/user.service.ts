@@ -29,7 +29,7 @@ export class UserService {
   async getRandomSongsBaseOnLikes(user: UserEntity) {
     const likedSongs = await this.getLikedSongs(user);
 
-    const response = { title: 'Recomendation', data: [] };
+    const response = { title: 'Base on your likes songs', data: [] };
 
     if (!likedSongs.length) return response;
 
