@@ -57,7 +57,7 @@ export class TelegramBot {
         title: song.title,
         performer: song.author,
         thumbnail: {
-          url: this.IMAGE_URL + song.sourceId + this.IMAGE_QUALITY,
+          url: this.IMAGE_URL + song.source_id + this.IMAGE_QUALITY,
         },
       },
     );

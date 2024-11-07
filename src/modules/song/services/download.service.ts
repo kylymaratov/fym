@@ -59,7 +59,7 @@ export class SongDownloadService {
     return new Promise((resolve, reject) => {
       const chunks: Buffer[] = [];
 
-      const ytdlpProcess = exec(URLS.WATCH_YT + song.sourceId, {
+      const ytdlpProcess = exec(URLS.WATCH_YT + song.source_id, {
         output: '-',
         format: 'bestaudio',
         noCheckCertificate: true,

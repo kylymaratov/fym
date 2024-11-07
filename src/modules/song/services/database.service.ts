@@ -12,7 +12,7 @@ import { SongLikeEntity } from 'src/database/entities/song/song.like.entity';
 export class SongDatabaseService {
   private SONG_FIELDS = [
     'song.id AS id',
-    'song.sourceId AS sourceId',
+    'song.source_id AS source_id',
     'song.original_title AS original_title',
     'song.title AS title',
     'song.author AS author',
@@ -37,9 +37,9 @@ export class SongDatabaseService {
     private songLikeRepository: Repository<SongLikeEntity>,
   ) {}
 
-  async findBySourceId(sourceId: string, relations: string[] = []) {
+  async findBySourceId(source_id: string, relations: string[] = []) {
     return await this.songRepository.findOne({
-      where: { sourceId },
+      where: { source_id },
       relations,
     });
   }
@@ -64,7 +64,7 @@ export class SongDatabaseService {
   async saveNewSong(song: TSong): Promise<void> {
     try {
       const ext_song = await this.songRepository.findOne({
-        where: { sourceId: song.sourceId },
+        where: { source_id: song.source_id },
       });
 
       if (ext_song) return;
@@ -103,7 +103,7 @@ export class SongDatabaseService {
 
   async incListenCount(songId: string) {
     await this.songRepository.increment(
-      { sourceId: songId },
+      { source_id: songId },
       'listened_count',
       1,
     );
@@ -135,7 +135,7 @@ export class SongDatabaseService {
       .addSelect('COUNT(like.id)', 'like_count')
       .where('like.userId = :userId', { userId: user.id })
       .groupBy('song.id')
-      .addGroupBy('song.sourceId')
+      .addGroupBy('song.source_id')
       .orderBy('like_count', 'DESC')
       .getRawMany();
 
@@ -149,7 +149,7 @@ export class SongDatabaseService {
       .select(this.SONG_FIELDS)
       .addSelect('COUNT(like.id)', 'like_count')
       .groupBy('song.id')
-      .addGroupBy('song.sourceId')
+      .addGroupBy('song.source_id')
       .orderBy('like_count', 'DESC')
       .limit(limit)
       .getRawMany();

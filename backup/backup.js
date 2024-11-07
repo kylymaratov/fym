@@ -6,7 +6,7 @@ const path = require('path');
 const FormData = require('form-data');
 
 const dbUser = 'klm';
-const dbName = 'songfiyapidev';
+const dbName = 'songfiyapi';
 const backupDir = path.join(__dirname, 'backups');
 const telegramToken = '7462820913:AAHDYiJz9YeboGKZlhGn2uHf92yfw0hEfTA';
 const chatId = '-4555571604';
@@ -60,4 +60,6 @@ async function sendBackupToTelegram(filePath) {
   }
 }
 
-backupDatabase();
+cron.schedule('', () => {
+  backupDatabase();
+});

@@ -5,6 +5,9 @@ import { Client, Video, VideoCompact } from 'youtubei';
 import { ConvertUtil } from 'src/utils/convert.util';
 import { KEYWOARDS } from 'src/constants/keywoards';
 import { REXEGP } from 'src/constants/regexp';
+import { SongEntity } from 'src/database/entities/song/song.entity';
+import { getBasicInfo, relatedVideo } from 'ytdl-core';
+import { URLS } from 'src/constants/urls';
 
 @Injectable()
 export class SongSearchService {
@@ -16,10 +19,78 @@ export class SongSearchService {
     @Inject() private convertUtil: ConvertUtil,
   ) {}
 
+  async getRelatedSongs(song: SongEntity): Promise<any[]> {
+    const songs = await getBasicInfo(URLS.WATCH_YT + song.source_id);
+
+    return await this.convertRelatedVideoToSong(songs.related_videos);
+  }
+
   async search(query: string, limit: number = 15) {
     const songs = await this.searchSongs(query, limit);
 
     return songs;
+  }
+
+  private async convertRelatedVideoToSong(
+    videos: relatedVideo[],
+  ): Promise<TSong[]> {
+    const result = [];
+    for (let video of videos) {
+      if (!this.relatedSongCheck(video)) continue;
+
+      const { author, title, artist } = this.getRelatedAuthorAndTitle(video);
+
+      const upload_date = video.published
+        ? this.convertUtil.convertDate(video.published)
+        : null;
+
+      const song = {
+        source_id: video.id,
+        title: title,
+        artist: artist,
+        author: author,
+        duration: video.length_seconds,
+        is_official: false,
+        original_title: video.title,
+        upload_date,
+      };
+
+      result.push(song);
+
+      await this.songDatabaseService.saveNewSong(song);
+    }
+    return result;
+  }
+
+  private getRelatedAuthorAndTitle(video: relatedVideo) {
+    const author =
+      typeof video.author === 'string'
+        ? video.author
+        : video.author.name || null;
+    const clreared_original_title = REXEGP.CLEAT_TITLE.reduce(
+      (acc, regex) => acc.replace(regex, ''),
+      video.title,
+    ).split('-');
+
+    return {
+      author,
+      title: clreared_original_title[1]?.trim() || null,
+      artist: clreared_original_title[0].trim() || null,
+    };
+  }
+
+  private relatedSongCheck(video: relatedVideo) {
+    const checkDuration = (): boolean => {
+      return video.length_seconds <= this.MAX_SONG_DURATION;
+    };
+
+    const checkByTitle = (): boolean => {
+      return KEYWOARDS.SONG_TITLE.some((keywoard) =>
+        video.title.includes(keywoard),
+      );
+    };
+
+    return checkDuration() && checkByTitle();
   }
 
   private convertVideoToSong(video: VideoCompact | Video): TSong {
@@ -34,7 +105,7 @@ export class SongSearchService {
       artist,
       upload_date,
       duration: video.duration as number,
-      sourceId: video.id,
+      source_id: video.id,
       original_title: video.title,
       is_official: author === artist,
     };

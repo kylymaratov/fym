@@ -15,8 +15,13 @@ export class UserController {
     return this.userService.getMe(user);
   }
 
-  @Get('liked')
+  @Get('/song/liked')
   getLikedSongs(@CurrentUser() user: UserEntity) {
     return this.userService.getLikedSongs(user);
+  }
+
+  @Get('/song/baseonlikes')
+  getRandomSongsBaseOnLikes(@CurrentUser() user: UserEntity) {
+    return this.userService.getRandomSongsBaseOnLikes(user);
   }
 }
