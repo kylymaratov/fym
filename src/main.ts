@@ -6,6 +6,7 @@ import { setServerSession } from './server/server.session';
 import { setServerPassport } from './server/server.passport';
 import { ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './server/server.exception';
+import { setServerDocumentaion } from './server/server.documentation';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,7 +17,8 @@ async function bootstrap() {
   setServerCors(app);
   setServerSession(app);
   setServerPassport(app);
+  setServerDocumentaion(app);
 
-  await app.listen(serverEnv.env.PORT ?? 3000);
+  await app.listen(serverEnv.env.PORT ?? 5000);
 }
 bootstrap();

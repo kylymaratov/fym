@@ -11,7 +11,7 @@ import { URLS } from 'src/constants/urls';
 
 @Injectable()
 export class SongSearchService {
-  private readonly MAX_SONG_DURATION: number = 300;
+  private readonly MAX_SONG_DURATION: number = 420;
   private readonly MIN_SONG_DURATION: number = 60;
   private readonly client: Client = new Client();
 

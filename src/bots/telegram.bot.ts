@@ -55,12 +55,15 @@ export class TelegramBot {
     form.append('performer', song.author);
 
     const thumbUrl = this.IMAGE_URL + song.source_id + this.IMAGE_QUALITY;
-    const thumbStream = await this.downloadThumbnail(thumbUrl);
 
-    form.append('thumb', thumbStream, {
-      filename: `${song.title}-thumb`,
-      contentType: 'image/jpeg',
-    });
+    try {
+      const thumbStream = await this.downloadThumbnail(thumbUrl);
+
+      form.append('thumb', thumbStream, {
+        filename: `${song.title}-thumb`,
+        contentType: 'image/jpeg',
+      });
+    } catch {}
 
     const response = await axios.post(
       `https://api.telegram.org/bot${this.BOT_TOKEN}/sendAudio`,

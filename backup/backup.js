@@ -5,8 +5,9 @@ const axios = require('axios');
 const path = require('path');
 const FormData = require('form-data');
 
-const dbUser = 'klm';
-const dbName = 'songfiyapi';
+const dbUser = process.argv[2] || '';
+const dbName = process.argv[3] || '';
+
 const backupDir = path.join(__dirname, 'backups');
 const telegramToken = '7462820913:AAHDYiJz9YeboGKZlhGn2uHf92yfw0hEfTA';
 const chatId = '-4555571604';
@@ -42,7 +43,7 @@ async function sendBackupToTelegram(filePath) {
     const form = new FormData();
     form.append('chat_id', chatId);
     form.append('document', fs.createReadStream(filePath));
-    form.append('caption', '#backup');
+    form.append('caption', `#backup ${dbName} - ${dbUser}`);
 
     const url = `https://api.telegram.org/bot${telegramToken}/sendDocument`;
 
@@ -60,6 +61,4 @@ async function sendBackupToTelegram(filePath) {
   }
 }
 
-cron.schedule('', () => {
-  backupDatabase();
-});
+backupDatabase();
