@@ -1,8 +1,8 @@
-# Songfiy API
+# Songfiy
 
 ![Logo](https://i.ibb.co/h26NdcZ/image.png)
 
-This API was created for downloading and listening to music.
+This apps was created for downloading and listening to music.
 
 ### How run this API?
 
