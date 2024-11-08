@@ -1,4 +1,4 @@
-# Songfiy
+# Songfiy API
 
 ![Logo](https://i.ibb.co/h26NdcZ/image.png)
 
