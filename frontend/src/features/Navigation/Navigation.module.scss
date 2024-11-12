@@ -1,0 +1,24 @@
+@use '@styles/colors' as *;
+
+.navigation {
+  width: 300px;
+  border-right: 2px solid $secondary_color;
+}
+
+.nav {
+  padding: 0 18px;
+
+  & > .menuItem {
+    margin: 15px 0;
+    background: $secondary_color;
+    width: 100%;
+
+    & > a {
+      color: $white_color;
+      text-decoration: none;
+      & > p {
+        font-size: 16px;
+      }
+    }
+  }
+}
