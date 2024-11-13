@@ -61,7 +61,7 @@ export class SongDatabaseService {
     return true;
   }
 
-  async saveNewSong(song: TSong): Promise<void> {
+  async saveNewSong(song: TSong): Promise<SongEntity> {
     try {
       const ext_song = await this.songRepository.findOne({
         where: { source_id: song.source_id },
@@ -71,7 +71,7 @@ export class SongDatabaseService {
 
       const newSong = this.songRepository.create(song);
 
-      await this.songRepository.save(newSong);
+      return await this.songRepository.save(newSong);
     } catch {}
   }
 

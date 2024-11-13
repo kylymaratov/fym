@@ -20,10 +20,34 @@ export class SongSearchService {
     @Inject() private convertUtil: ConvertUtil,
   ) {}
 
-  async getRelatedSongs(song: SongEntity): Promise<any[]> {
+  async getRelatedSongs(song: SongEntity): Promise<SongEntity[]> {
     const songs = await getBasicInfo(URLS.WATCH_YT + song.source_id);
 
-    return await this.convertRelatedVideoToSong(songs.related_videos);
+    return await this.convertYtdlCoreVideo(songs.related_videos);
+  }
+
+  async searchOneSong(songId: string): Promise<SongEntity> {
+    const { videoDetails } = await getBasicInfo(URLS.WATCH_YT + songId);
+
+    const convertedSong: relatedVideo = {
+      id: videoDetails.videoId,
+      title: videoDetails.title,
+      published: videoDetails.publishDate,
+      author: videoDetails.author,
+      ucid: '',
+      author_thumbnail: '',
+      short_view_count_text: '',
+      view_count: '',
+      length_seconds: Number(videoDetails.lengthSeconds) || 0,
+      video_thumbnail: '',
+      thumbnails: [],
+      richThumbnails: [],
+      isLive: videoDetails.isLiveContent,
+    };
+
+    const res = await this.convertYtdlCoreVideo([convertedSong]);
+
+    return res[0];
   }
 
   async search(query: string, limit: number = 15) {
@@ -32,38 +56,40 @@ export class SongSearchService {
     return songs;
   }
 
-  private async convertRelatedVideoToSong(
+  private async convertYtdlCoreVideo(
     videos: relatedVideo[],
-  ): Promise<TSong[]> {
-    const result = [];
-    for (let video of videos) {
-      if (!this.relatedSongCheck(video)) continue;
+  ): Promise<SongEntity[]> {
+    const songs: SongEntity[] = [];
 
-      const { author, title, artist } = this.getRelatedAuthorAndTitle(video);
+    for (let video of videos) {
+      if (!this.ytdlCoreSongCheck(video, videos.length === 1)) {
+        continue;
+      }
+
+      const { author, title, artist } = this.getYtdlCoreAuthorAndTitle(video);
 
       const upload_date = video.published
         ? this.convertUtil.convertDate(video.published)
         : null;
 
-      const song = {
+      const song: TSong = {
         source_id: video.id,
         title: title,
         artist: artist,
         author: author,
         duration: video.length_seconds,
-        is_official: false,
+        is_official: author === artist,
         original_title: video.title,
         upload_date,
       };
 
-      result.push(song);
-
-      await this.songDatabaseService.saveNewSong(song);
+      const saved_song = await this.songDatabaseService.saveNewSong(song);
+      songs.push(saved_song);
     }
-    return result;
+    return songs;
   }
 
-  private getRelatedAuthorAndTitle(video: relatedVideo) {
+  private getYtdlCoreAuthorAndTitle(video: relatedVideo) {
     const author =
       typeof video.author === 'string'
         ? video.author
@@ -80,7 +106,7 @@ export class SongSearchService {
     };
   }
 
-  private relatedSongCheck(video: relatedVideo) {
+  private ytdlCoreSongCheck(video: relatedVideo, skip_title?: boolean) {
     const checkDuration = (): boolean => {
       return (
         video.length_seconds <= this.MAX_SONG_DURATION &&
@@ -89,6 +115,8 @@ export class SongSearchService {
     };
 
     const checkByTitle = (): boolean => {
+      if (skip_title) return true;
+
       return KEYWOARDS.SONG_TITLE.some((keywoard) =>
         video.title.includes(keywoard),
       );
@@ -97,8 +125,8 @@ export class SongSearchService {
     return checkDuration() && checkByTitle();
   }
 
-  private convertVideoToSong(video: VideoCompact | Video): TSong {
-    const { author, title, artist } = this.getAuthorAndTitle(video);
+  private convertYoutubeIVideo(video: VideoCompact | Video): TSong {
+    const { author, title, artist } = this.getYoutubeIAuthorAndTitle(video);
     const upload_date = video.uploadDate
       ? this.convertUtil.convertDate(video.uploadDate)
       : null;
@@ -115,7 +143,7 @@ export class SongSearchService {
     };
   }
 
-  private songCheck(video: VideoCompact | Video) {
+  private youtubeISongCheck(video: VideoCompact | Video) {
     const checkDuration = (): boolean => {
       return (
         video.duration <= this.MAX_SONG_DURATION &&
@@ -132,7 +160,7 @@ export class SongSearchService {
     return checkDuration() && checkByTitle();
   }
 
-  private getAuthorAndTitle(video: VideoCompact | Video) {
+  private getYoutubeIAuthorAndTitle(video: VideoCompact | Video) {
     const author = video.channel?.name.trim() || null;
     const clreared_original_title = REXEGP.CLEAT_TITLE.reduce(
       (acc, regex) => acc.replace(regex, ''),
@@ -149,23 +177,23 @@ export class SongSearchService {
   private async searchSongs(
     query: string,
     limit: number = 20,
-  ): Promise<TSong[]> {
+  ): Promise<SongEntity[]> {
     const videos = await this.client.search(query, { type: 'video' });
 
-    const songs: TSong[] = [];
+    const songs: SongEntity[] = [];
 
     for (const [index, video] of videos.items.entries()) {
       if (index >= limit) break;
 
       if (video.isLive) continue;
       if (video.id === 'didyoumean') continue;
-      if (!this.songCheck(video)) continue;
+      if (!this.youtubeISongCheck(video)) continue;
 
-      const song: TSong = this.convertVideoToSong(video);
+      const song: TSong = this.convertYoutubeIVideo(video);
 
-      songs.push(song);
+      const saved_song = await this.songDatabaseService.saveNewSong(song);
 
-      await this.songDatabaseService.saveNewSong(song);
+      songs.push(saved_song);
     }
 
     return songs;

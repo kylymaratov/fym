@@ -1,12 +1,13 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Request } from 'express';
 
 @Injectable()
 export class IpGuard implements CanActivate {
-  private allowedIps: string[] = ['127.0.0.1', 'localhost'];
+  private allowedIps: string[] = ['127.0.0.1', '::1'];
 
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
-    const ip = request.ip;
+    const request = context.switchToHttp().getRequest<Request>();
+    const ip = (request.headers['x-forwarded-for'] as string) || request.ip;
 
     return this.allowedIps.includes(ip);
   }

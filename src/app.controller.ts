@@ -6,13 +6,9 @@ import { IpGuard } from './guards/ip.guard';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
-  @Get('backupinfo')
+  @Get('env')
   @UseGuards(IpGuard)
   getBackUpInfo() {
-    return this.appService.getBackUpInfo();
+    return this.appService.getServerEnv();
   }
 }

@@ -21,11 +21,17 @@ import { SearchSongsDto } from './dto/search.dto';
 import { CurrentUser } from 'src/decorators/user.decorator';
 import { UserEntity } from 'src/database/entities/user/user.entity';
 import { LikeSongDto } from './dto/like.dto';
+import { GetSongDto } from './dto/getsong.dto';
 
 @ApiTags('song')
 @Controller(`/api/${serverEnv.sv}/song`)
 export class SongController {
   constructor(private readonly songService: SongService) {}
+
+  @Get('/')
+  getSongById(@Query() query: GetSongDto) {
+    return this.songService.getSongById(query);
+  }
 
   @Get('top-listened')
   getTopListenedSongs() {
@@ -35,11 +41,6 @@ export class SongController {
   @Get('top')
   getTopSongs() {
     return this.songService.getTopSongs();
-  }
-
-  @Get('token')
-  getTempToken(@CurrentUser() user: UserEntity) {
-    return this.songService.getTempToken(user);
   }
 
   @UseGuards(ApiAuthGuard)
@@ -74,19 +75,19 @@ export class SongController {
 
     res.setHeader('Accept-Ranges', 'bytes');
     res.setHeader('Content-Type', contentType);
-    res.setHeader('Cache-Control', 'max-age=3600');
+    res.setHeader('Cache-Control', 'no-cache');
 
-    if (!isAuth) {
-      const partContentLength = Math.floor(contentLength / 4) - 1;
+    // if (!isAuth) {
+    //   const partContentLength = Math.floor(contentLength / 4) - 1;
 
-      res.setHeader('Content-Length', partContentLength + 1);
-      res.setHeader(
-        'Content-Range',
-        `bytes ${0}-${partContentLength - 1}/${partContentLength}`,
-      );
+    //   res.setHeader('Content-Length', partContentLength + 1);
+    //   res.setHeader(
+    //     'Content-Range',
+    //     `bytes ${0}-${partContentLength - 1}/${partContentLength}`,
+    //   );
 
-      return Readable.from(buffer.slice(0, partContentLength + 1)).pipe(res);
-    }
+    //   return Readable.from(buffer.slice(0, partContentLength + 1)).pipe(res);
+    // }
 
     let start = 0;
     let end = contentLength - 1;

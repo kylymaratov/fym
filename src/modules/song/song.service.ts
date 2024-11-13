@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Inject,
@@ -11,6 +12,7 @@ import { ListenSongDto } from './dto/listen.dto';
 import { SongDatabaseService } from './services/database.service';
 import { SongDownloadService } from './services/download.service';
 import { UserEntity } from 'src/database/entities/user/user.entity';
+import { GetSongDto } from './dto/getsong.dto';
 
 @Injectable()
 export class SongService {
@@ -35,7 +37,20 @@ export class SongService {
       'metadata',
     ]);
 
-    if (!song) throw new NotFoundException('Song not found in database');
+    if (!song) {
+      const saved_song = await this.songSearchService.searchOneSong(songId);
+      if (!saved_song) {
+        throw new BadRequestException(
+          "I can't download this song. Maybe it's not a song",
+        );
+      }
+      const { buffer, metadata } = await this.songDownloadService.downloadSong(
+        saved_song,
+        quality,
+      );
+
+      return { buffer, metadata };
+    }
 
     if (song.is_downloading)
       throw new HttpException(
@@ -91,5 +106,15 @@ export class SongService {
     return { title: 'Top listened songs', data: result };
   }
 
-  async getTempToken(user: UserEntity) {}
+  async getSongById(query: GetSongDto) {
+    const { songId } = query;
+
+    const song = await this.songDatabaseService.findBySourceId(songId, [
+      'metadata',
+    ]);
+
+    if (!song) throw new NotFoundException('Song not found in database');
+
+    return song;
+  }
 }

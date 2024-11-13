@@ -42,9 +42,9 @@ export class SongDownloadService {
       await this.songDatabaseService.setSongCache(song, buffer);
 
       return { buffer, metadata };
-    } catch {
+    } catch (error) {
       throw new HttpException(
-        { message: 'Try later', timeout: 60000 },
+        { message: (error as Error).message, timeout: 60000 },
         HttpStatus.SERVICE_UNAVAILABLE,
       );
     } finally {
@@ -78,8 +78,14 @@ export class SongDownloadService {
         resolve(buffer);
       });
 
-      ytdlpProcess.on('error', () => {
-        reject();
+      ytdlpProcess.on('exit', (code) => {
+        if (code !== 0) {
+          reject(new Error(`Download process exited with code ${code}`));
+        }
+      });
+
+      ytdlpProcess.on('error', (error) => {
+        reject(new Error(`Failed to download: ${error.message}`));
       });
     });
   }

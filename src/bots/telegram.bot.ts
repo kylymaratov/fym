@@ -51,8 +51,8 @@ export class TelegramBot {
       contentType: 'audio/mp3',
     });
 
-    form.append('title', song.title);
-    form.append('performer', song.author);
+    form.append('title', song.title || song.original_title);
+    form.append('performer', song.author || song.artist);
 
     const thumbUrl = this.IMAGE_URL + song.source_id + this.IMAGE_QUALITY;
 

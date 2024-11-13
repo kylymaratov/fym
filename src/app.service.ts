@@ -1,16 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { serverEnv } from './server/server.env';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  private readonly algorithm = 'aes-256-cbc';
+  private readonly secretKey = process.env.APP_SECRET;
+  private readonly iv = crypto.randomBytes(16);
+
+  private encrypt(text: string): string {
+    const cipher = crypto.createCipheriv(
+      this.algorithm,
+      this.secretKey,
+      this.iv,
+    );
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    return `${this.iv.toString('hex')}:${encrypted}`;
   }
 
-  getBackUpInfo() {
+  getServerEnv() {
     return {
-      BOT_TOKEN: serverEnv.env.BOT_TOKEN,
-      CHAT_ID: serverEnv.env.CHAT_ID,
+      BOT_TOKEN: this.encrypt(process.env.BOT_TOKEN || ''),
+      CHAT_ID: this.encrypt(process.env.TELEGRAM_CHAT_ID || ''),
     };
   }
 }
