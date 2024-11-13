@@ -18,7 +18,7 @@ export const setServerSession = (app: INestApplication) => {
         createTableIfMissing: true,
         ttl: 30 * 24 * 60 * 60,
       }),
-      secret: process.env.APP_SECRET,
+      secret: process.env.SERCRET_KEY,
       resave: false,
       saveUninitialized: false,
       cookie: {

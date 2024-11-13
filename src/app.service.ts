@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { serverEnv } from './server/server.env';
 import * as crypto from 'crypto';
 
 @Injectable()
 export class AppService {
   private readonly algorithm = 'aes-256-cbc';
-  private readonly secretKey = process.env.APP_SECRET;
+  private readonly secretKey = process.env.SERCRET_KEY;
   private readonly iv = crypto.randomBytes(16);
 
   private encrypt(text: string): string {
