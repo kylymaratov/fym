@@ -5,14 +5,12 @@ import { SongEntity } from 'src/database/entities/song/song.entity';
 import { SongDatabaseService } from './database.service';
 import { TelegramBot } from 'src/bots/telegram.bot';
 import { URLS } from 'src/constants/urls';
-import { ServerLogger } from 'src/server/server.logger';
 
 @Injectable()
 export class SongDownloadService {
   constructor(
     @Inject() private songDatabaseService: SongDatabaseService,
     @Inject() private telegramBot: TelegramBot,
-    private logger: ServerLogger,
   ) {}
 
   async downloadFromTelegram(song: SongEntity): Promise<Buffer> {
@@ -22,9 +20,9 @@ export class SongDownloadService {
       await this.songDatabaseService.setSongCache(song, buffer);
 
       return buffer;
-    } catch {
+    } catch (error) {
       throw new HttpException(
-        { message: 'Try later', ms: 60000 },
+        { message: (error as Error).message, ms: 60000 },
         HttpStatus.SERVICE_UNAVAILABLE,
       );
     }

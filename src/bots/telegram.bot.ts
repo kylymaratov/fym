@@ -18,11 +18,11 @@ export class TelegramBot {
 
   constructor(private convertUtil: ConvertUtil) {}
 
-  async sendLog(text: string, level: 'warning' | 'error'): Promise<void> {
+  async sendLog(msg: string): Promise<void> {
     try {
       const formData = new FormData();
       formData.append('chat_id', this.TELEGRAM_CHAT_ID);
-      formData.append('text', `Message: ${text}\nLevel: ${level}`);
+      formData.append('text', msg);
 
       await axios.post(
         `https://api.telegram.org/bot${this.BOT_TOKEN}/sendMessage`,

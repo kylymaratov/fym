@@ -28,8 +28,10 @@ class Utils:
     async def request_to_song(self, songId):
         async with aiohttp.ClientSession() as session:
                 async with session.get(config.SERVER_HOST + "/api/v1/song?songId=" + songId) as response:
+                    if response.status != 404:
+                        return None  
                     if response.status != 200:
-                        return None   
+                         raise Exception("Song cannot be download") 
 
                     data = await response.json()   
 

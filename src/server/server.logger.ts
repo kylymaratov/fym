@@ -3,16 +3,15 @@ import { TelegramBot } from 'src/bots/telegram.bot';
 
 @Injectable()
 export class ServerLogger extends ConsoleLogger {
-  constructor(
-    @Inject(TelegramBot) private readonly telegramBot: TelegramBot, // Injecting the TelegramBot
-  ) {
+  constructor(@Inject(TelegramBot) private readonly telegramBot: TelegramBot) {
     super();
   }
 
   async error(message: any, stack?: string, context?: string) {
     super.error(message, stack, context);
     try {
-      await this.telegramBot.sendLog(message, 'error');
+      const msg = `Message: ${message}\nLevel: Error\nTimestamp: ${Date.now()}`;
+      await this.telegramBot.sendLog(msg);
     } catch (error) {
       super.error('Failed to send error log to Telegram', error.message);
     }
@@ -21,7 +20,8 @@ export class ServerLogger extends ConsoleLogger {
   async warn(message: any, stack?: string, context?: string) {
     super.warn(message, stack, context);
     try {
-      await this.telegramBot.sendLog(message, 'warning');
+      const msg = `Message: ${message}\nLevel: Warning\nTimestamp: ${Date.now()}`;
+      await this.telegramBot.sendLog(msg);
     } catch (error) {
       super.warn('Failed to send warning log to Telegram', error.message);
     }

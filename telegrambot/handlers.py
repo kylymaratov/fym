@@ -9,10 +9,14 @@ class Handlers:
         self.request_count = 5
         
     async def send_start_message(self, message):
+        if message.chat.type != "private":
+            return
         text = "Hello, I'm a bot assistant. I can send you any music from YouTube for free and without restrictions. You can find out more with the command /help"
         await self.bot.send_message(message.chat.id, text)
 
-    async def send_help_message(self, message):    
+    async def send_help_message(self, message):   
+        if message.chat.type != "private":
+            return 
         await self.bot.reply_to(message, message.text)
 
     async def message_handler(self, message):
@@ -48,8 +52,8 @@ class Handlers:
 
             await self.bot.send_audio(message.chat.id, metadata.get("file_id"))
 
-        except Exception as err:
-             await self.bot.reply_to(message, str(err))
+        except:
+             await self.bot.reply_to(message, "Service unavilable, please try later.")
         finally: 
             if sended_message:
                  await self.bot.delete_message(sended_message.chat.id, sended_message.message_id)
