@@ -11,6 +11,7 @@ import { SongCacheEntity } from 'src/database/entities/song/song.cache.entity';
 import { SongMetadataEntity } from 'src/database/entities/song/song.metadata.entity';
 import { ConvertUtil } from 'src/utils/convert.util';
 import { SongLikeEntity } from 'src/database/entities/song/song.like.entity';
+import { ServerLogger } from 'src/server/server.logger';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { SongLikeEntity } from 'src/database/entities/song/song.like.entity';
     SongDownloadService,
     TelegramBot,
     ConvertUtil,
+    ServerLogger,
   ],
   exports: [SongDatabaseService, SongSearchService],
 })

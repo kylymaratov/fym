@@ -5,7 +5,7 @@ parser.add_argument("--mode", choices=["dev", "prod"], default="dev")
 args = parser.parse_args()
  
 if args.mode == "prod":
-    SERVER_HOST = "https://songfiy.online"
+    SERVER_HOST = "http://localhost:5000"
     SECRET_KEY = ""
 else:
     SERVER_HOST = "http://localhost:5000"

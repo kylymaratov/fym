@@ -13,6 +13,7 @@ import { SongDatabaseService } from './services/database.service';
 import { SongDownloadService } from './services/download.service';
 import { UserEntity } from 'src/database/entities/user/user.entity';
 import { GetSongDto } from './dto/getsong.dto';
+import { ServerLogger } from 'src/server/server.logger';
 
 @Injectable()
 export class SongService {
@@ -20,6 +21,7 @@ export class SongService {
     @Inject() private songSearchService: SongSearchService,
     @Inject() private songDatabaseService: SongDatabaseService,
     @Inject() private songDownloadService: SongDownloadService,
+    private logger: ServerLogger,
   ) {}
 
   async search(body: SearchSongsDto) {
@@ -40,6 +42,7 @@ export class SongService {
     if (!song) {
       const saved_song = await this.songSearchService.searchOneSong(songId);
       if (!saved_song) {
+        this.logger.error("It's not song");
         throw new BadRequestException(
           "I can't download this song. Maybe it's not a song",
         );

@@ -18,6 +18,23 @@ export class TelegramBot {
 
   constructor(private convertUtil: ConvertUtil) {}
 
+  async sendLog(text: string, level: 'warning' | 'error'): Promise<void> {
+    try {
+      const formData = new FormData();
+      formData.append('chat_id', this.TELEGRAM_CHAT_ID);
+      formData.append('text', `Message: ${text}\nLevel: ${level}`);
+
+      await axios.post(
+        `https://api.telegram.org/bot${this.BOT_TOKEN}/sendMessage`,
+        formData,
+        {
+          headers: formData.getHeaders(),
+        },
+      );
+    } catch (error) {
+      console.error('Failed to send log to Telegram:', error.message);
+    }
+  }
   async downloadSong(song: SongEntity): Promise<Buffer> {
     const file = await this.getFile(song.metadata.file_id);
     const response = await axios.get(this.FILE_DOWNLOAD_URL + file.file_path, {

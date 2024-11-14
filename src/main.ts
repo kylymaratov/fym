@@ -7,9 +7,10 @@ import { setServerPassport } from './server/server.passport';
 import { ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './server/server.exception';
 import { setServerDocumentaion } from './server/server.documentation';
+import { ServerLogger } from './server/server.logger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {});
 
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter());
