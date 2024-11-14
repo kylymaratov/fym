@@ -15,6 +15,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     new TelegramBot(new ConvertUtil()),
   );
   private warning_status_codes = [404];
+  private ignone_status_codes = [403];
 
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -23,7 +24,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
     const errResponse = exception.getResponse();
 
-    if (this.warning_status_codes.includes(status)) {
+    if (this.ignone_status_codes.includes(status)) {
+    } else if (this.warning_status_codes.includes(status)) {
       this.logger.warn(JSON.stringify(errResponse));
     } else {
       this.logger.error(JSON.stringify(errResponse));

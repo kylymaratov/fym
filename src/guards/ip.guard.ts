@@ -3,7 +3,12 @@ import { Request } from 'express';
 
 @Injectable()
 export class IpGuard implements CanActivate {
-  private allowedIps: string[] = ['127.0.0.1', '::1'];
+  private allowedIps: string[] = [
+    '127.0.0.1',
+    '::1',
+    'localhost',
+    'host.docker.internal',
+  ];
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
