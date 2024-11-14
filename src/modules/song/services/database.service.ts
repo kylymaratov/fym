@@ -67,7 +67,7 @@ export class SongDatabaseService {
         where: { source_id: song.source_id },
       });
 
-      if (ext_song) return;
+      if (ext_song) return ext_song;
 
       const newSong = this.songRepository.create(song);
 
