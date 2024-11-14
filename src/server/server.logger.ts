@@ -8,9 +8,8 @@ export class ServerLogger extends ConsoleLogger {
   }
 
   async error(message: any, stack?: string, context?: string) {
-    super.error(message, stack, context);
     try {
-      const msg = `Message: ${message}\nLevel: Error\nTimestamp: ${Date.now()}`;
+      const msg = `#Error\n\n${message}\n\nTimestamp: ${new Date().toLocaleString()}`;
       await this.telegramBot.sendLog(msg);
     } catch (error) {
       super.error('Failed to send error log to Telegram', error.message);
@@ -18,9 +17,8 @@ export class ServerLogger extends ConsoleLogger {
   }
 
   async warn(message: any, stack?: string, context?: string) {
-    super.warn(message, stack, context);
     try {
-      const msg = `Message: ${message}\nLevel: Warning\nTimestamp: ${Date.now()}`;
+      const msg = `#Warning\n\n${message}\n\nLevel: Warning\nTimestamp: ${new Date().toLocaleString()}`;
       await this.telegramBot.sendLog(msg);
     } catch (error) {
       super.warn('Failed to send warning log to Telegram', error.message);

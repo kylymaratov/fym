@@ -42,9 +42,9 @@ export class SongService {
     if (!song) {
       const saved_song = await this.songSearchService.searchOneSong(songId);
       if (!saved_song) {
-        this.logger.error("It's not song");
         throw new BadRequestException(
-          "I can't download this song. Maybe it's not a song",
+          "I can't download this song. Maybe it's not a song, songId: " +
+            songId,
         );
       }
       const { buffer, metadata } = await this.songDownloadService.downloadSong(
@@ -116,7 +116,8 @@ export class SongService {
       'metadata',
     ]);
 
-    if (!song) throw new NotFoundException('Song not found in database');
+    if (!song)
+      throw new NotFoundException(`SongId: ${songId} not found in database`);
 
     return song;
   }

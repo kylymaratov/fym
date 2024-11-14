@@ -20,8 +20,8 @@ export class UserController {
     return this.userService.getLikedSongs(user);
   }
 
-  @Get('/song/baseonlikes')
-  getRandomSongsBaseOnLikes(@CurrentUser() user: UserEntity) {
-    return this.userService.getRandomSongsBaseOnLikes(user);
+  @Get('/song/recomend')
+  getRecomendSongs(@CurrentUser() user: UserEntity) {
+    return this.userService.getRecomendSongs(user);
   }
 }

@@ -29,6 +29,7 @@ export class TelegramBot {
         formData,
         {
           headers: formData.getHeaders(),
+          timeout: 10000,
         },
       );
     } catch (error) {
@@ -70,6 +71,7 @@ export class TelegramBot {
 
     form.append('title', song.title || song.original_title);
     form.append('performer', song.author || song.artist);
+    form.append('caption', '#song');
 
     const thumbUrl = this.IMAGE_URL + song.source_id + this.IMAGE_QUALITY;
 
