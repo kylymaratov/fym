@@ -2,7 +2,7 @@ import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { UserEntity } from '../user/user.entity';
 import { SongEntity } from './song.entity';
 
-@Entity('song_likes')
+@Entity('song_like')
 export class SongLikeEntity {
   @PrimaryGeneratedColumn()
   id: number;

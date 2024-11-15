@@ -10,9 +10,9 @@ const entities = [
 const dbDataSource = new DataSource({
   type: 'postgres',
   url: serverEnv.dbUrl,
-  synchronize: serverEnv.isProd ? true : false,
+  synchronize: false,
   migrationsTableName: 'typeorm_migrations',
-  migrationsRun: false,
+  migrationsRun: serverEnv.isProd ? true : false,
   entities,
   migrations: [join(__dirname, 'migrations', '*.{ts,js}')],
 });
