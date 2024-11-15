@@ -17,11 +17,4 @@ export class AppService {
     encrypted += cipher.final('hex');
     return `${this.iv.toString('hex')}:${encrypted}`;
   }
-
-  getServerEnv() {
-    return {
-      BOT_TOKEN: this.encrypt(process.env.BOT_TOKEN || ''),
-      CHAT_ID: this.encrypt(process.env.TELEGRAM_CHAT_ID || ''),
-    };
-  }
 }

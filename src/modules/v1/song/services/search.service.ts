@@ -26,7 +26,7 @@ export class SongSearchService {
     return await this.convertYtdlCoreVideo(songs.related_videos);
   }
 
-  async searchOneSong(songId: string): Promise<SongEntity> {
+  async findOneSong(songId: string): Promise<SongEntity> {
     const { videoDetails } = await getBasicInfo(URLS.WATCH_YT + songId);
 
     const convertedSong: relatedVideo = {

@@ -21,7 +21,6 @@ export class SongService {
     @Inject() private songSearchService: SongSearchService,
     @Inject() private songDatabaseService: SongDatabaseService,
     @Inject() private songDownloadService: SongDownloadService,
-    private logger: ServerLogger,
   ) {}
 
   async search(body: SearchSongsDto) {
@@ -40,7 +39,7 @@ export class SongService {
     ]);
 
     if (!song) {
-      const saved_song = await this.songSearchService.searchOneSong(songId);
+      const saved_song = await this.songSearchService.findOneSong(songId);
       if (!saved_song) {
         throw new BadRequestException(
           "I can't download this song. Maybe it's not a song, songId: " +

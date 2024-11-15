@@ -16,15 +16,17 @@ import { LoginDto } from './dto/login.dto';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
-import { ApiAuthGuard } from 'src/guards/api.auth.guard';
+import { CurrentUser } from 'src/decorators/user.decorator';
+import { UserEntity } from 'src/database/entities/user/user.entity';
+import { JwtAuthGuard } from './guards/jwt.auth.guard';
 
 @ApiTags('auth')
 @Controller(`/api/${serverEnv.sv}/auth`)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UseGuards(ApiAuthGuard)
   @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
   @Get('logout')
   logout(@Req() req: Request, @Res() res: Response) {
     req.logout((err) => {
@@ -43,8 +45,8 @@ export class AuthController {
   @Post('login')
   @HttpCode(200)
   @ApiBody({ type: [LoginDto] })
-  login(@Req() req: Request) {
-    return req.user;
+  localLogin(@Req() req: Request, @CurrentUser() user: UserEntity) {
+    return this.authService.login(req, user);
   }
 
   @ApiBody({ type: [RegisterDto] })

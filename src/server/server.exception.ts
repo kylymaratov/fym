@@ -24,10 +24,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
     const errResponse = exception.getResponse();
 
-    if (this.ignone_status_codes.includes(status)) {
-    } else if (this.warning_status_codes.includes(status)) {
-      this.logger.warn(JSON.stringify(errResponse));
-    } else {
+    if (status >= 500) {
       this.logger.error(JSON.stringify(errResponse));
     }
 

@@ -13,7 +13,6 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { serverEnv } from 'src/server/server.env';
 import { SongService } from './song.service';
-import { ApiAuthGuard } from 'src/guards/api.auth.guard';
 import { ListenSongDto } from './dto/listen.dto';
 import { Request, Response } from 'express';
 import { Readable } from 'stream';
@@ -43,7 +42,6 @@ export class SongController {
     return this.songService.getTopSongs();
   }
 
-  @UseGuards(ApiAuthGuard)
   @Post('download')
   @HttpCode(200)
   async downloadSong(
@@ -118,7 +116,6 @@ export class SongController {
   }
 
   @Put('like')
-  @UseGuards(ApiAuthGuard)
   @HttpCode(200)
   likeSong(@CurrentUser() user: UserEntity, @Query() query: LikeSongDto) {
     const { songId } = query;
