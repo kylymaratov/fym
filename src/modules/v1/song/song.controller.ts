@@ -21,6 +21,7 @@ import { CurrentUser } from 'src/decorators/user.decorator';
 import { UserEntity } from 'src/database/entities/user/user.entity';
 import { LikeSongDto } from './dto/like.dto';
 import { GetSongDto } from './dto/getsong.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt.auth.guard';
 
 @ApiTags('song')
 @Controller(`/api/${serverEnv.sv}/song`)
@@ -44,6 +45,7 @@ export class SongController {
 
   @Post('download')
   @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
   async downloadSong(
     @Query() query: ListenSongDto,
     @Req() req: Request,
@@ -61,6 +63,7 @@ export class SongController {
 
   @Get('listen')
   @HttpCode(206)
+  @UseGuards(JwtAuthGuard)
   async listenSong(
     @Query() query: ListenSongDto,
     @Req() req: Request,
@@ -69,23 +72,6 @@ export class SongController {
     const { buffer, metadata } = await this.songService.listen(query);
     const contentLength = metadata.file_size;
     const contentType = metadata.mime_type;
-    const isAuth = !!req.user;
-
-    res.setHeader('Accept-Ranges', 'bytes');
-    res.setHeader('Content-Type', contentType);
-    res.setHeader('Cache-Control', 'no-cache');
-
-    // if (!isAuth) {
-    //   const partContentLength = Math.floor(contentLength / 4) - 1;
-
-    //   res.setHeader('Content-Length', partContentLength + 1);
-    //   res.setHeader(
-    //     'Content-Range',
-    //     `bytes ${0}-${partContentLength - 1}/${partContentLength}`,
-    //   );
-
-    //   return Readable.from(buffer.slice(0, partContentLength + 1)).pipe(res);
-    // }
 
     let start = 0;
     let end = contentLength - 1;
@@ -117,6 +103,7 @@ export class SongController {
 
   @Put('like')
   @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
   likeSong(@CurrentUser() user: UserEntity, @Query() query: LikeSongDto) {
     const { songId } = query;
     return this.songService.like(user, songId);
