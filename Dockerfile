@@ -16,7 +16,8 @@ COPY . .
 RUN npm run build
 
 RUN npm run migration:generate -- ./src/database/migration/Init
+RUN npm run migration:run
 
 EXPOSE 5000
 
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:dev"]

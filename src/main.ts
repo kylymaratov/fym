@@ -19,6 +19,6 @@ async function bootstrap() {
   setServerPassport(app);
   setServerDocumentaion(app);
 
-  await app.listen(serverEnv.env.PORT ?? 5000);
+  await app.listen(serverEnv.isProd ? 5000 : 5001);
 }
 bootstrap();

@@ -3,7 +3,7 @@ import { config } from 'dotenv';
 config();
 
 const dbHost =
-  process.env.NODE_ENV === 'production' ? 'host.docker.internal' : 'localhost';
+  process.env.MODE === 'production' ? 'host.docker.internal' : 'localhost';
 
 interface ServerEnv {
   env: NodeJS.ProcessEnv;
@@ -14,7 +14,7 @@ interface ServerEnv {
 }
 
 const getDbURl = () => {
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.MODE === 'production') {
     return `${process.env.DB_URL}@${dbHost}:5432/songfiyapi`;
   } else {
     return `${process.env.DB_URL}@${dbHost}:5432/songfiyapidev`;
@@ -23,7 +23,7 @@ const getDbURl = () => {
 
 export const serverEnv: ServerEnv = {
   env: process.env,
-  isProd: process.env.NODE_ENV === 'production',
+  isProd: process.env.MODE === 'production',
   sv: 'v1',
   dbHost,
   dbUrl: getDbURl(),

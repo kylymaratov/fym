@@ -12,7 +12,7 @@ const dbDataSource = new DataSource({
   url: serverEnv.dbUrl,
   synchronize: false,
   migrationsTableName: 'typeorm_migrations',
-  migrationsRun: serverEnv.isProd ? true : false,
+  migrationsRun: false,
   entities,
   migrations: [join(__dirname, 'migrations', '*.{ts,js}')],
 });
