@@ -7,12 +7,13 @@ import { Repository } from 'typeorm';
 import { TSong } from '../types/song.types';
 import { UserEntity } from 'src/database/entities/user/user.entity';
 import { SongLikeEntity } from 'src/database/entities/song/song.like.entity';
+import { ServerLogger } from 'src/server/server.logger';
 
 @Injectable()
 export class SongDatabaseService {
   private SONG_FIELDS = [
     'song.id AS id',
-    'song.source_id AS source_id',
+    'song.song_id AS song_id',
     'song.original_title AS original_title',
     'song.title AS title',
     'song.author AS author',
@@ -35,11 +36,12 @@ export class SongDatabaseService {
     private songMetadataRepository: Repository<SongMetadataEntity>,
     @InjectRepository(SongLikeEntity)
     private songLikeRepository: Repository<SongLikeEntity>,
+    private logger: ServerLogger,
   ) {}
 
-  async findBySourceId(source_id: string, relations: string[] = []) {
+  async findBySourceId(song_id: string, relations: string[] = []) {
     return await this.songRepository.findOne({
-      where: { source_id },
+      where: { song_id },
       relations,
     });
   }
@@ -64,7 +66,7 @@ export class SongDatabaseService {
   async saveNewSong(song: TSong): Promise<SongEntity> {
     try {
       const ext_song = await this.songRepository.findOne({
-        where: { source_id: song.source_id },
+        where: { song_id: song.song_id },
       });
 
       if (ext_song) return ext_song;
@@ -78,7 +80,7 @@ export class SongDatabaseService {
   async setSongCache(song: SongEntity, buffer: Buffer) {
     if (song.cache) return;
 
-    await this.cleanOldCachedSongs();
+    this.cleanOldCachedSongs();
     const cache = this.songCacheRepository.create({ buffer });
 
     await this.songCacheRepository.save(cache);
@@ -103,7 +105,7 @@ export class SongDatabaseService {
 
   async incListenCount(songId: string) {
     await this.songRepository.increment(
-      { source_id: songId },
+      { song_id: songId },
       'listened_count',
       1,
     );
@@ -135,7 +137,7 @@ export class SongDatabaseService {
       .addSelect('COUNT(like.id)', 'like_count')
       .where('like.userId = :userId', { userId: user.id })
       .groupBy('song.id')
-      .addGroupBy('song.source_id')
+      .addGroupBy('song.song_id')
       .orderBy('like_count', 'DESC')
       .getRawMany();
 
@@ -149,7 +151,7 @@ export class SongDatabaseService {
       .select(this.SONG_FIELDS)
       .addSelect('COUNT(like.id)', 'like_count')
       .groupBy('song.id')
-      .addGroupBy('song.source_id')
+      .addGroupBy('song.song_id')
       .orderBy('like_count', 'DESC')
       .limit(limit)
       .getRawMany();
@@ -180,6 +182,10 @@ export class SongDatabaseService {
             .execute();
         }
       }
-    } catch {}
+    } catch (error) {
+      this.logger.error(
+        'Error while clear old songs caches: ' + (error as Error).message,
+      );
+    }
   }
 }

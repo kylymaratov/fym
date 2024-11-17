@@ -6,7 +6,7 @@ import { serverEnv } from './server.env';
 
 export const setServerSession = (app: INestApplication) => {
   const pgPool = new pg.Pool({
-    connectionString: serverEnv.dbUrl,
+    connectionString: serverEnv.db_url,
   });
   const PgSession = pgSession(session);
 

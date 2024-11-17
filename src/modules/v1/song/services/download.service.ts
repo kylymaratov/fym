@@ -22,7 +22,7 @@ export class SongDownloadService {
       return buffer;
     } catch (error) {
       throw new HttpException(
-        { message: (error as Error).message, ms: 60000 },
+        { message: (error as Error).message, timeout: 60000 },
         HttpStatus.SERVICE_UNAVAILABLE,
       );
     }
@@ -59,7 +59,7 @@ export class SongDownloadService {
     return new Promise((resolve, reject) => {
       const chunks: Buffer[] = [];
 
-      const ytdlpProcess = exec(URLS.WATCH_YT + song.source_id, {
+      const ytdlpProcess = exec(URLS.WATCH_YT + song.song_id, {
         output: '-',
         format: 'bestaudio',
         noCheckCertificate: true,

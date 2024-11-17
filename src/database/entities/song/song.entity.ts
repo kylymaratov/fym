@@ -19,7 +19,7 @@ export class SongEntity {
   id: number;
 
   @PrimaryColumn({ unique: true, nullable: false })
-  source_id: string;
+  song_id: string;
 
   @Column()
   original_title: string;

@@ -21,7 +21,7 @@ export class SongSearchService {
   ) {}
 
   async getRelatedSongs(song: SongEntity): Promise<SongEntity[]> {
-    const songs = await getBasicInfo(URLS.WATCH_YT + song.source_id);
+    const songs = await getBasicInfo(URLS.WATCH_YT + song.song_id);
 
     return await this.convertYtdlCoreVideo(songs.related_videos);
   }
@@ -73,7 +73,7 @@ export class SongSearchService {
         : null;
 
       const song: TSong = {
-        source_id: video.id,
+        song_id: video.id,
         title: title,
         artist: artist,
         author: author,
@@ -137,7 +137,7 @@ export class SongSearchService {
       artist,
       upload_date,
       duration: video.duration as number,
-      source_id: video.id,
+      song_id: video.id,
       original_title: video.title,
       is_official: author === artist,
     };

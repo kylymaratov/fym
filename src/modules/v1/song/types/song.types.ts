@@ -1,5 +1,5 @@
 export interface TSong {
-  source_id: string;
+  song_id: string;
   original_title: string;
   title: string;
   artist: string | null;

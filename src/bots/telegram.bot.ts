@@ -73,7 +73,7 @@ export class TelegramBot {
     form.append('performer', song.author || song.artist);
     form.append('caption', '#song');
 
-    const thumbUrl = this.IMAGE_URL + song.source_id + this.IMAGE_QUALITY;
+    const thumbUrl = this.IMAGE_URL + song.song_id + this.IMAGE_QUALITY;
 
     try {
       const thumbStream = await this.downloadThumbnail(thumbUrl);

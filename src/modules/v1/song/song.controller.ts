@@ -89,6 +89,8 @@ export class SongController {
       this.songService.icnListenCount(query.songId);
     }
 
+    res.setHeader('Accept-Ranges', 'bytes');
+    res.setHeader('Content-Type', contentType);
     res.setHeader('Content-Length', end - start + 1);
     res.setHeader('Content-Range', `bytes ${start}-${end}/${contentLength}`);
 

@@ -9,7 +9,7 @@ const entities = [
 
 const dbDataSource = new DataSource({
   type: 'postgres',
-  url: serverEnv.dbUrl,
+  url: serverEnv.db_url,
   synchronize: false,
   migrationsTableName: 'typeorm_migrations',
   migrationsRun: false,
