@@ -12,7 +12,6 @@ import { ServerLogger } from 'src/server/server.logger';
 @Injectable()
 export class SongDatabaseService {
   private SONG_FIELDS = [
-    'song.id AS id',
     'song.song_id AS song_id',
     'song.original_title AS original_title',
     'song.title AS title',
@@ -46,7 +45,7 @@ export class SongDatabaseService {
     });
   }
 
-  async likeSong(user: UserEntity, song: SongEntity) {
+  async likeToSong(user: UserEntity, song: SongEntity) {
     const like = await this.songLikeRepository.findOne({
       where: { user: { id: user.id }, song: { song_id: song.song_id } },
     });
@@ -130,7 +129,7 @@ export class SongDatabaseService {
 
     await this.songRepository.save(song);
   }
-  async findTopListenedSongs() {
+  async findMoreAuidionsSongs() {
     const songs = await this.songRepository
       .createQueryBuilder('song')
       .orderBy('listened_count', 'DESC')
@@ -144,7 +143,7 @@ export class SongDatabaseService {
       .createQueryBuilder('song')
       .leftJoin('song.song_likes', 'like')
       .select(this.SONG_FIELDS)
-      .addSelect('COUNT(like.id)', 'like_count')
+      .addSelect('COUNT(like.song_id)', 'like_count')
       .where('like.userId = :userId', { userId: user.id })
       .groupBy('song.id')
       .addGroupBy('song.song_id')
@@ -154,15 +153,15 @@ export class SongDatabaseService {
     return songs;
   }
 
-  async findTopSongs(limit: number = 20): Promise<SongEntity[]> {
+  async findTopSongsByLike(limit: number = 20): Promise<SongEntity[]> {
     const songs = await this.songRepository
       .createQueryBuilder('song')
       .leftJoin('song.song_likes', 'like')
       .select(this.SONG_FIELDS)
-      .addSelect('COUNT(like.id)', 'like_count')
+      .addSelect('COUNT(like.song_id)', 'likes')
       .groupBy('song.id')
       .addGroupBy('song.song_id')
-      .orderBy('like_count', 'DESC')
+      .orderBy('likes', 'DESC')
       .limit(limit)
       .getRawMany();
 

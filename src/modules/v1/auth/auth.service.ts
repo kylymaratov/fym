@@ -32,7 +32,7 @@ export class AuthService {
     return await this.userDatabaseService.findUserById(userId);
   }
 
-  async login(req: Request, user: UserEntity) {
+  async loginUser(req: Request, user: UserEntity) {
     const payload = { username: user.email, sub: user.id };
     const access_token = this.jwtService.sign(payload);
 

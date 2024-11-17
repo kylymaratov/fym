@@ -13,7 +13,6 @@ import { SongDatabaseService } from './services/database.service';
 import { SongDownloadService } from './services/download.service';
 import { UserEntity } from 'src/database/entities/user/user.entity';
 import { GetSongDto } from './dto/getsong.dto';
-import { ServerLogger } from 'src/server/server.logger';
 
 @Injectable()
 export class SongService {
@@ -86,24 +85,24 @@ export class SongService {
     } catch {}
   }
 
-  async like(user: UserEntity, songId: string) {
+  async likeToSong(user: UserEntity, songId: string) {
     const song = await this.songDatabaseService.findBySongId(songId);
 
     if (!song) throw new NotFoundException('Song not found in database');
 
-    const liked = await this.songDatabaseService.likeSong(user, song);
+    const liked = await this.songDatabaseService.likeToSong(user, song);
 
     return { message: 'OK', liked };
   }
 
-  async getTopSongs() {
-    const result = await this.songDatabaseService.findTopSongs();
+  async getTopSongsByLike() {
+    const result = await this.songDatabaseService.findTopSongsByLike();
 
     return { title: 'Top Songs', data: result };
   }
 
-  async getTopListenedSongs() {
-    const result = await this.songDatabaseService.findTopListenedSongs();
+  async getMoreAuidionsSongs() {
+    const result = await this.songDatabaseService.findMoreAuidionsSongs();
 
     return { title: 'Top listened songs', data: result };
   }

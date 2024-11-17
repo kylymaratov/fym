@@ -33,32 +33,14 @@ export class SongController {
     return this.songService.getSongById(query);
   }
 
-  @Get('top-listened')
-  getTopListenedSongs() {
-    return this.songService.getTopListenedSongs();
+  @Get('more-auditions')
+  getMoreAuidionsSongs() {
+    return this.songService.getMoreAuidionsSongs();
   }
 
-  @Get('top')
-  getTopSongs() {
-    return this.songService.getTopSongs();
-  }
-
-  @Post('download')
-  @HttpCode(200)
-  @UseGuards(JwtAuthGuard)
-  async downloadSong(
-    @Query() query: ListenSongDto,
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
-    const { buffer, metadata } = await this.songService.listen(query);
-    const contentLength = metadata.file_size;
-    const contentType = metadata.mime_type;
-
-    res.setHeader('Content-Type', contentType);
-    res.setHeader('Content-Length', contentLength);
-
-    return Readable.from(buffer).pipe(res);
+  @Get('top-by-likes')
+  getTopSongsByLike() {
+    return this.songService.getTopSongsByLike();
   }
 
   @Get('listen')
@@ -106,8 +88,8 @@ export class SongController {
   @Put('like')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
-  likeSong(@CurrentUser() user: UserEntity, @Query() query: LikeSongDto) {
+  likeToSong(@CurrentUser() user: UserEntity, @Query() query: LikeSongDto) {
     const { songId } = query;
-    return this.songService.like(user, songId);
+    return this.songService.likeToSong(user, songId);
   }
 }

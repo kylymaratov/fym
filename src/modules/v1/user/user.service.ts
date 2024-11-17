@@ -13,30 +13,38 @@ export class UserService {
   ) {}
 
   async getMe(user: UserEntity) {
-    const result = await this.userDatabaseService.findUserWithRel(user, [
+    const { user_info } = await this.userDatabaseService.findUserWithRel(user, [
       'user_info',
     ]);
 
-    return { ...user, user_info: result.user_info };
+    return { ...user, user_info };
+  }
+
+  async getUserSessions(user: UserEntity) {
+    const sessions = await this.userDatabaseService.findUserSessionsById(
+      user.id,
+    );
+
+    return { user, sessions };
   }
 
   async getLikedSongs(user: UserEntity) {
     const songs = await this.songDatabaseService.findUserLikedSongs(user);
 
-    return songs;
+    return { title: 'Your liked songs', songs };
   }
 
   async getRecomendSongs(user: UserEntity) {
-    const likedSongs = await this.getLikedSongs(user);
+    const likedSongs = (await this.getLikedSongs(user)).songs;
 
-    const response = { title: 'Recomendation', data: [] };
+    const response = { title: 'Songs for you', songs: [] };
 
     if (!likedSongs.length) return response;
 
     const randomSong =
       likedSongs[Math.floor(Math.random() * likedSongs.length)];
 
-    response.data = await this.songSearchService.getRelatedSongs(randomSong);
+    response.songs = await this.songSearchService.getRelatedSongs(randomSong);
 
     return response;
   }

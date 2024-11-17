@@ -16,6 +16,11 @@ export class UserController {
     return this.userService.getMe(user);
   }
 
+  @Get('sessions')
+  getUserSessions(@CurrentUser() user: UserEntity) {
+    return this.userService.getUserSessions(user);
+  }
+
   @Get('/song/liked')
   getLikedSongs(@CurrentUser() user: UserEntity) {
     return this.userService.getLikedSongs(user);

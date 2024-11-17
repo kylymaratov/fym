@@ -28,7 +28,7 @@ export class AuthController {
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
   @Get('logout')
-  logout(@Req() req: Request, @Res() res: Response) {
+  logoutUser(@Req() req: Request, @Res() res: Response) {
     req.logout((err) => {
       if (err) throw new InternalServerErrorException();
 
@@ -45,8 +45,8 @@ export class AuthController {
   @Post('login')
   @HttpCode(200)
   @ApiBody({ type: [LoginDto] })
-  localLogin(@Req() req: Request, @CurrentUser() user: UserEntity) {
-    return this.authService.login(req, user);
+  loginUser(@Req() req: Request, @CurrentUser() user: UserEntity) {
+    return this.authService.loginUser(req, user);
   }
 
   @ApiBody({ type: [RegisterDto] })

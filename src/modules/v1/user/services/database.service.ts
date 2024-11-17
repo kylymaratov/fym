@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import dbDataSource from 'src/database/database.provider';
 import { UserEntity } from 'src/database/entities/user/user.entity';
 import { UserInfoEntity } from 'src/database/entities/user/user.info.entity';
 import { RegisterDto } from 'src/modules/v1/auth/dto/register.dto';
@@ -33,7 +34,23 @@ export class UserDatabaseService {
     });
   }
 
-  async findMyLikedSongs() {}
+  async findUserSessionsById(id: number) {
+    const client = await dbDataSource.connect();
+
+    const sessions = await client.query(
+      "SELECT * FROM sessions WHERE sess -> 'passport' ->> 'user' = $1",
+      [id],
+    );
+
+    await dbDataSource.close();
+
+    return sessions.map((session) => ({
+      user_agent: session.sess.user_agent,
+      secure: session.sess.cookie.secure,
+      expire_date: session.sess.cookie.expires,
+      user_ip: session.sess.user_ip,
+    }));
+  }
 
   async createUser(body: RegisterDto) {
     const queryRunner =
