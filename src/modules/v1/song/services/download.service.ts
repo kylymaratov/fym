@@ -15,6 +15,7 @@ export class SongDownloadService {
 
   async downloadFromTelegram(song: SongEntity): Promise<Buffer> {
     try {
+      await this.songDatabaseService.updateDownloadingStatus(song, true);
       const buffer = await this.telegramBot.downloadSong(song);
 
       await this.songDatabaseService.setSongCache(song, buffer);
@@ -25,6 +26,8 @@ export class SongDownloadService {
         { message: (error as Error).message, timeout: 60000 },
         HttpStatus.SERVICE_UNAVAILABLE,
       );
+    } finally {
+      await this.songDatabaseService.updateDownloadingStatus(song, false);
     }
   }
 

@@ -1,10 +1,10 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
 import { UserEntity } from './user.entity';
 
 @Entity('user_info')
 export class UserInfoEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn({ unique: true, nullable: false })
+  user_sub_id: string;
 
   @Column({ nullable: true })
   first_name: string;

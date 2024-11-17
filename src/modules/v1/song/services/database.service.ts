@@ -25,7 +25,7 @@ export class SongDatabaseService {
     'song.created AS created',
     'song.updated AS updated',
   ];
-  private MAX_CACHE_SIZE: number = 1000;
+  private MAX_CACHE_SIZE: number = 500;
 
   constructor(
     @InjectRepository(SongEntity)
@@ -39,7 +39,7 @@ export class SongDatabaseService {
     private logger: ServerLogger,
   ) {}
 
-  async findBySourceId(song_id: string, relations: string[] = []) {
+  async findBySongId(song_id: string, relations: string[] = []) {
     return await this.songRepository.findOne({
       where: { song_id },
       relations,
@@ -48,7 +48,7 @@ export class SongDatabaseService {
 
   async likeSong(user: UserEntity, song: SongEntity) {
     const like = await this.songLikeRepository.findOne({
-      where: { user: { id: user.id }, song: { id: song.id } },
+      where: { user: { id: user.id }, song: { song_id: song.song_id } },
     });
 
     if (like) {
@@ -56,7 +56,11 @@ export class SongDatabaseService {
       return false;
     }
 
-    const new_like = this.songLikeRepository.create({ user, song });
+    const new_like = this.songLikeRepository.create({
+      song_id: song.song_id,
+      user,
+      song,
+    });
 
     await this.songLikeRepository.save(new_like);
 
@@ -81,7 +85,10 @@ export class SongDatabaseService {
     if (song.cache) return;
 
     this.cleanOldCachedSongs();
-    const cache = this.songCacheRepository.create({ buffer });
+    const cache = this.songCacheRepository.create({
+      song_id: song.song_id,
+      buffer,
+    });
 
     await this.songCacheRepository.save(cache);
 
@@ -99,7 +106,7 @@ export class SongDatabaseService {
       .createQueryBuilder()
       .update(SongCacheEntity)
       .set({ last_accessed: () => 'NOW()' })
-      .where('id = :id', { id: song.cache.id })
+      .where('song_id = :song_id', { song_id: song.cache.song_id })
       .execute();
   }
 
@@ -112,7 +119,10 @@ export class SongDatabaseService {
   }
 
   async updateSongMetadata(song: SongEntity, metadata: SongMetadataEntity) {
-    const newMetadata = this.songMetadataRepository.create(metadata);
+    const newMetadata = this.songMetadataRepository.create({
+      song_id: song.song_id,
+      ...metadata,
+    });
 
     await this.songMetadataRepository.save(newMetadata);
 
@@ -165,10 +175,10 @@ export class SongDatabaseService {
         .createQueryBuilder('cache')
         .getCount();
 
-      if (totalCacheSize > this.MAX_CACHE_SIZE) {
+      if (totalCacheSize >= this.MAX_CACHE_SIZE) {
         const oldCacheIds = await this.songCacheRepository
           .createQueryBuilder('cache')
-          .select('cache.id')
+          .select('cache.song_id')
           .orderBy('cache.last_accessed', 'ASC')
           .limit(totalCacheSize - this.MAX_CACHE_SIZE)
           .getMany();
@@ -178,7 +188,7 @@ export class SongDatabaseService {
             .createQueryBuilder()
             .delete()
             .from(SongCacheEntity)
-            .whereInIds(oldCacheIds.map((cache) => cache.id))
+            .whereInIds(oldCacheIds.map((cache) => cache.song_id))
             .execute();
         }
       }

@@ -1,10 +1,10 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
 import { SongEntity } from './song.entity';
 
 @Entity({ name: 'song_metadata' })
 export class SongMetadataEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn({ unique: true, nullable: false })
+  song_id: string;
 
   @Column()
   file_id: string;

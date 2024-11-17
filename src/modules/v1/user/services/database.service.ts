@@ -18,6 +18,10 @@ export class UserDatabaseService {
     return await this.userRepository.findOne({ where: { id } });
   }
 
+  async findUserBySubId(user_sub_id: string) {
+    return await this.userRepository.findOne({ where: { user_sub_id } });
+  }
+
   async findUserByEmail(email: string) {
     return await this.userRepository.findOne({ where: { email } });
   }
@@ -40,7 +44,10 @@ export class UserDatabaseService {
       const user = this.userRepository.create(body);
       const savedUser = await queryRunner.manager.save(user);
 
-      const user_info = this.userInfoRepository.create({ user: savedUser });
+      const user_info = this.userInfoRepository.create({
+        user: savedUser,
+        user_sub_id: savedUser.user_sub_id,
+      });
       const savedUserInfo = await queryRunner.manager.save(user_info);
 
       savedUser.user_info = savedUserInfo;

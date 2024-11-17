@@ -33,7 +33,7 @@ export class SongService {
   async listen(query: ListenSongDto) {
     const { songId, quality } = query;
 
-    const song = await this.songDatabaseService.findBySourceId(songId, [
+    const song = await this.songDatabaseService.findBySongId(songId, [
       'cache',
       'metadata',
     ]);
@@ -87,7 +87,7 @@ export class SongService {
   }
 
   async like(user: UserEntity, songId: string) {
-    const song = await this.songDatabaseService.findBySourceId(songId);
+    const song = await this.songDatabaseService.findBySongId(songId);
 
     if (!song) throw new NotFoundException('Song not found in database');
 
@@ -111,7 +111,7 @@ export class SongService {
   async getSongById(query: GetSongDto) {
     const { songId } = query;
 
-    const song = await this.songDatabaseService.findBySourceId(songId, [
+    const song = await this.songDatabaseService.findBySongId(songId, [
       'metadata',
     ]);
 
