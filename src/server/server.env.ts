@@ -2,8 +2,7 @@ import { config } from 'dotenv';
 
 config();
 
-const dbHost =
-  process.env.MODE === 'production' ? 'host.docker.internal' : 'localhost';
+const dbHost = process.env.DB_HOST || 'localhost';
 
 interface ServerEnv {
   env: NodeJS.ProcessEnv;

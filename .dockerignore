@@ -2,3 +2,4 @@ node_modules/
 frontend/
 telegrambot/
 dist/
+src/database/migrations/
