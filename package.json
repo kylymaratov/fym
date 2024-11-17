@@ -1,7 +1,7 @@
 {
   "name": "songfiy-api",
   "version": "0.0.1",
-  "description": "Music streaming service, for free and without borders",
+  "description": "API for streaming music for free and without borders",
   "author": "Kylym",
   "private": true,
   "license": "UNLICENSED",
