@@ -18,7 +18,6 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { CurrentUser } from 'src/decorators/user.decorator';
 import { UserEntity } from 'src/database/entities/user/user.entity';
-import { JwtAuthGuard } from './guards/jwt.auth.guard';
 
 @ApiTags('auth')
 @Controller(`/api/${serverEnv.sv}/auth`)
@@ -26,7 +25,6 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @HttpCode(200)
-  @UseGuards(JwtAuthGuard)
   @Get('logout')
   logoutUser(@Req() req: Request, @Res() res: Response) {
     req.logout((err) => {

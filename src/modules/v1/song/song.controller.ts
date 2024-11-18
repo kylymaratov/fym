@@ -45,7 +45,6 @@ export class SongController {
 
   @Get('listen')
   @HttpCode(206)
-  @UseGuards(JwtAuthGuard)
   async listenSong(
     @Query() query: ListenSongDto,
     @Req() req: Request,

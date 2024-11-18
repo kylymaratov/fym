@@ -19,7 +19,10 @@ export class AuthService {
 
     if (!user) return null;
 
-    const isMatch = this.passwrodUtil.matchPassword(password, user.password);
+    const isMatch = await this.passwrodUtil.matchPassword(
+      password,
+      user.password,
+    );
 
     if (isMatch) {
       const { password, ...result } = user;
