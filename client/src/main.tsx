@@ -7,11 +7,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import RootContext from './app/index.tsx';
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <BrowserRouter>
-      <RootContext>
+  <RootContext>
+    <StrictMode>
+      <BrowserRouter>
         <App />
-      </RootContext>
-    </BrowserRouter>
-  </StrictMode>,
+      </BrowserRouter>
+    </StrictMode>
+  </RootContext>,
 );

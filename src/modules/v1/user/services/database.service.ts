@@ -64,6 +64,7 @@ export class UserDatabaseService {
       const user_info = this.userInfoRepository.create({
         user: savedUser,
         user_sub_id: savedUser.user_sub_id,
+        name: body.name,
       });
       const savedUserInfo = await queryRunner.manager.save(user_info);
 

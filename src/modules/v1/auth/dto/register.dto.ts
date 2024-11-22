@@ -14,4 +14,7 @@ export class RegisterDto {
   })
   @IsByteLength(8, Infinity)
   password: string;
+
+  @ApiProperty({ type: 'string' })
+  name: string;
 }

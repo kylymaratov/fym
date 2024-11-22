@@ -3,12 +3,15 @@ import * as session from 'express-session';
 import * as pgSession from 'connect-pg-simple';
 import * as pg from 'pg';
 import { serverEnv } from './server.env';
+import * as cookieParser from 'cookie-parser';
 
 export const setServerSession = (app: INestApplication) => {
   const pgPool = new pg.Pool({
     connectionString: serverEnv.db_url,
   });
   const PgSession = pgSession(session);
+
+  app.use(cookieParser());
 
   app.use(
     session({
@@ -22,6 +25,7 @@ export const setServerSession = (app: INestApplication) => {
       resave: false,
       saveUninitialized: false,
       cookie: {
+        path: '/',
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         secure: serverEnv.isProd,

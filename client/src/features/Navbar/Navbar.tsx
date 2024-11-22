@@ -1,12 +1,25 @@
 import { UserContext } from '@/app/context/UserContext';
-import { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
+import { IoLogIn } from 'react-icons/io5';
+import { useNavigate } from 'react-router-dom';
 
 export const Navbar = () => {
   const { state } = useContext(UserContext);
+  const navigate = useNavigate();
+  const [fixed, setFixed] = useState<boolean>(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      setFixed(window.scrollY > 100);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   return (
-    <div className="w-full p-2 border-b-2 border-secondary flex items-center justify-between">
+    <div className="w-full h-[60px] p-2 border-b-2 border-secondary flex items-center justify-between">
       <div className="relative w-1/3 h-full">
         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
           <svg
@@ -28,20 +41,23 @@ export const Navbar = () => {
         <input
           type="search"
           id="default-search"
-          className="block w-full h-[40px] ps-10 outline-none text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          placeholder="Search Mockups, Logos..."
+          className="block w-full h-full ps-10 outline-none text-sm text-gray-900 border border-gray-300 rounded-lg dark:bg-secondary  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+          placeholder="Search songs by name, artist, keywords..."
           required
         />
       </div>
-      <div>
+      <div className="flex items-center justify-end">
         {state.user ? (
           <div>{state.user.id}</div>
         ) : (
-          <div>
-            <Link to="/login" className="text-bold text-md">
-              Login
-            </Link>
-          </div>
+          <button
+            onClick={() => navigate('/login')}
+            type="button"
+            className="dark:text-gray-200 text-sm flex items-center font-bold rounded-md px-5 py-2.5"
+          >
+            <span className="mt-1"> Login</span>{' '}
+            <IoLogIn className="ml-1" size={22} />
+          </button>
         )}
       </div>
     </div>

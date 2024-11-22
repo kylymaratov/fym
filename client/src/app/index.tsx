@@ -14,7 +14,7 @@ function RootContext({ children }: Props) {
   );
 
   return providers.reduceRight(
-    (acc, Provider) => <Provider>{children}</Provider>,
+    (acc, Provider) => <Provider>{acc}</Provider>,
     children,
   );
 }

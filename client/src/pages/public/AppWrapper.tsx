@@ -14,7 +14,6 @@ export default function AppWrapper({}: Props) {
         <div className="flex-grow-1 overflow-auto w-full">
           <Outlet />
         </div>
-        <DynamicSection />
       </div>
       <MusicPlayer />
     </div>

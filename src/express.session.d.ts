@@ -6,5 +6,6 @@ declare module 'express-session' {
     access_token: string;
     user_agent: string;
     user_ip: string;
+    recently_plays: string[];
   }
 }

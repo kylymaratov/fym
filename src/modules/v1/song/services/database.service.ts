@@ -66,6 +66,16 @@ export class SongDatabaseService {
     return true;
   }
 
+  async findRandomSongs(limit: number) {
+    const randomSong = await this.songRepository
+      .createQueryBuilder('song')
+      .orderBy('RANDOM()')
+      .limit(limit)
+      .getMany();
+
+    return randomSong;
+  }
+
   async saveNewSong(song: TSong): Promise<SongEntity> {
     try {
       const ext_song = await this.songRepository.findOne({
@@ -129,16 +139,17 @@ export class SongDatabaseService {
 
     await this.songRepository.save(song);
   }
-  async findMoreAuidionsSongs() {
+  async findMoreAuidionsSongs(limit: number) {
     const songs = await this.songRepository
       .createQueryBuilder('song')
       .orderBy('listened_count', 'DESC')
+      .limit(limit)
       .getMany();
 
     return songs;
   }
 
-  async findUserLikedSongs(user: UserEntity) {
+  async findUserLikedSongs(user: UserEntity, limit: number) {
     const songs = await this.songRepository
       .createQueryBuilder('song')
       .leftJoin('song.song_likes', 'like')
@@ -148,12 +159,13 @@ export class SongDatabaseService {
       .groupBy('song.id')
       .addGroupBy('song.song_id')
       .orderBy('like_count', 'DESC')
+      .limit(limit)
       .getRawMany();
 
     return songs;
   }
 
-  async findTopSongsByLike(limit: number = 20): Promise<SongEntity[]> {
+  async findTopSongsByLike(limit: number): Promise<SongEntity[]> {
     const songs = await this.songRepository
       .createQueryBuilder('song')
       .leftJoin('song.song_likes', 'like')
@@ -165,7 +177,7 @@ export class SongDatabaseService {
       .limit(limit)
       .getRawMany();
 
-    return songs;
+    return songs.map((song) => ({ ...song, likes: Number(song.likes) || 0 }));
   }
 
   private async cleanOldCachedSongs() {

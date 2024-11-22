@@ -28,8 +28,11 @@ export class UserService {
     return { user, sessions };
   }
 
-  async getLikedSongs(user: UserEntity) {
-    const songs = await this.songDatabaseService.findUserLikedSongs(user);
+  async getLikedSongs(user: UserEntity, limit: number = 20) {
+    const songs = await this.songDatabaseService.findUserLikedSongs(
+      user,
+      limit,
+    );
 
     return { title: 'Your liked songs', songs };
   }

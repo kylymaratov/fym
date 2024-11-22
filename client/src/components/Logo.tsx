@@ -1,7 +1,9 @@
+import LogoPng from '@/assets/images/logo.png';
+
 export const Logo = () => {
   return (
-    <div className="flex items-center justify-center bg-slate-800 rounded-lg p-1">
-      <span className="text-xl text-white font-extrabold">Songify</span>
+    <div className="flex items-center justify-start">
+      <img src={LogoPng} alt="logo" loading="lazy" width={120} height={70} />
     </div>
   );
 };

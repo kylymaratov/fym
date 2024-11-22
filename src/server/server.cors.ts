@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { serverEnv } from './server.env';
 
-const hosts = serverEnv.isProd ? ['/'] : ['http://localhost:5174'];
+const hosts = serverEnv.isProd ? ['/'] : ['http://localhost:3000'];
 
 export const setServerCors = (app: INestApplication) => {
   app.enableCors({

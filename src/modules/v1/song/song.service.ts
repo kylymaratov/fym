@@ -13,6 +13,7 @@ import { SongDatabaseService } from './services/database.service';
 import { SongDownloadService } from './services/download.service';
 import { UserEntity } from 'src/database/entities/user/user.entity';
 import { GetSongDto } from './dto/getsong.dto';
+import { Request } from 'express';
 
 @Injectable()
 export class SongService {
@@ -85,8 +86,8 @@ export class SongService {
     } catch {}
   }
 
-  async likeToSong(user: UserEntity, songId: string) {
-    const song = await this.songDatabaseService.findBySongId(songId);
+  async likeToSong(user: UserEntity, song_id: string) {
+    const song = await this.songDatabaseService.findBySongId(song_id);
 
     if (!song) throw new NotFoundException('Song not found in database');
 
@@ -95,16 +96,52 @@ export class SongService {
     return { message: 'OK', liked };
   }
 
-  async getTopSongsByLike() {
-    const result = await this.songDatabaseService.findTopSongsByLike();
+  async getTopSongsByLike(limit: number = 10) {
+    const result = await this.songDatabaseService.findTopSongsByLike(limit);
 
-    return { title: 'Top Songs', data: result };
+    return { title: 'Top Songs', songs: result };
   }
 
-  async getMoreAuidionsSongs() {
-    const result = await this.songDatabaseService.findMoreAuidionsSongs();
+  async getMoreAuidionsSongs(limit: number = 10) {
+    const result = await this.songDatabaseService.findMoreAuidionsSongs(limit);
 
-    return { title: 'Top listened songs', data: result };
+    return { title: 'Top listened songs', songs: result };
+  }
+
+  addRecentlyPlays(req: Request, song_id: string) {
+    try {
+      if (!req.session.recently_plays) {
+        req.session.recently_plays = [song_id];
+        return;
+      }
+
+      if (req.session.recently_plays.length > 50) {
+        req.session.recently_plays.splice(0, 10);
+      }
+
+      if (req.session.recently_plays.includes(song_id)) {
+        const index = req.session.recently_plays.indexOf(song_id);
+
+        req.session.recently_plays.splice(index, 1);
+
+        req.session.recently_plays.push(song_id);
+        return;
+      }
+
+      req.session.recently_plays.push(song_id);
+    } catch {}
+  }
+
+  async getRecentlySongs(recently_plays: string[], limit: number = 20) {
+    const limitedRecentlyPlays = recently_plays.slice(0, limit).reverse();
+
+    const songs = await Promise.all(
+      limitedRecentlyPlays.map((recently) =>
+        this.songDatabaseService.findBySongId(recently),
+      ),
+    );
+
+    return { title: 'Recently plays', songs };
   }
 
   async getSongById(query: GetSongDto) {
@@ -118,5 +155,11 @@ export class SongService {
       throw new NotFoundException(`SongId: ${songId} not found in database`);
 
     return song;
+  }
+
+  async getRandomSongs(limit: number = 20) {
+    const songs = await this.songDatabaseService.findRandomSongs(limit);
+
+    return { title: 'Random songs', songs };
   }
 }

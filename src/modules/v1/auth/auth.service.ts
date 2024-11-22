@@ -35,9 +35,11 @@ export class AuthService {
     return await this.userDatabaseService.findUserById(userId);
   }
 
-  async loginUser(req: Request, user: UserEntity) {
+  loginUser(req: Request, user: UserEntity) {
     const payload = { username: user.email, sub: user.id };
-    const access_token = this.jwtService.sign(payload);
+    const expiresIn = '10d';
+    const expiresInMilliseconds = 10 * 24 * 60 * 60 * 1000;
+    const access_token = this.jwtService.sign(payload, { expiresIn });
 
     req.session.access_token = access_token;
     req.session.user_agent = req.headers['user-agent'] || '';
@@ -46,6 +48,7 @@ export class AuthService {
     return {
       message: 'Successfilly logged',
       access_token,
+      expiresInMilliseconds,
     };
   }
 

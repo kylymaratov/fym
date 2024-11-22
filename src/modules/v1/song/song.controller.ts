@@ -34,13 +34,26 @@ export class SongController {
   }
 
   @Get('more-auditions')
-  getMoreAuidionsSongs() {
-    return this.songService.getMoreAuidionsSongs();
+  getMoreAuidionsSongs(@Query() query: { limit: number }) {
+    return this.songService.getMoreAuidionsSongs(query.limit);
+  }
+
+  @Get('random')
+  getRandomSongs(@Query() query: { limit: number }) {
+    return this.songService.getRandomSongs(query.limit);
   }
 
   @Get('top-by-likes')
-  getTopSongsByLike() {
-    return this.songService.getTopSongsByLike();
+  getTopSongsByLike(@Query() query: { limit: number }) {
+    return this.songService.getTopSongsByLike(query.limit);
+  }
+
+  @Get('recently')
+  getRecentlySongs(@Req() req: Request, @Query() query: { limit: number }) {
+    return this.songService.getRecentlySongs(
+      req.session.recently_plays || [],
+      query.limit,
+    );
   }
 
   @Get('listen')
@@ -66,16 +79,18 @@ export class SongController {
           : end;
     }
 
-    if (start === 0) {
-      this.songService.icnListenCount(query.songId);
-    }
-
     res.setHeader('Accept-Ranges', 'bytes');
     res.setHeader('Content-Type', contentType);
     res.setHeader('Content-Length', end - start + 1);
     res.setHeader('Content-Range', `bytes ${start}-${end}/${contentLength}`);
 
-    return Readable.from(buffer.slice(start, end + 1)).pipe(res);
+    Readable.from(buffer.slice(start, end + 1)).pipe(res);
+
+    if (start === 0) {
+      this.songService.icnListenCount(query.songId);
+    }
+
+    this.songService.addRecentlyPlays(req, query.songId);
   }
 
   @Post('search')
@@ -88,7 +103,7 @@ export class SongController {
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
   likeToSong(@CurrentUser() user: UserEntity, @Query() query: LikeSongDto) {
-    const { songId } = query;
-    return this.songService.likeToSong(user, songId);
+    const { song_id } = query;
+    return this.songService.likeToSong(user, song_id);
   }
 }

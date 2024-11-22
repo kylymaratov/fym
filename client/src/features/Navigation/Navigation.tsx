@@ -38,7 +38,7 @@ export const Navigation = () => {
         {menuList.map((menu) => (
           <Link to={menu.href} key={menu.href}>
             <div
-              className={`flex justify-start items-center mt-3 cursor-pointer duration-200 w-full p-2 rounded-md ${location.pathname === menu.href ? 'bg-slate-600' : ''}`}
+              className={`flex justify-start items-center mt-3 cursor-pointer duration-200 w-full p-2 rounded-md ${location.pathname === menu.href ? 'bg-secondary' : ''}`}
             >
               <menu.icon size={24} />
               <span className="ml-4 text-sm">{menu.title}</span>

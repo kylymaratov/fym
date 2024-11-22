@@ -43,8 +43,21 @@ export class AuthController {
   @Post('login')
   @HttpCode(200)
   @ApiBody({ type: [LoginDto] })
-  loginUser(@Req() req: Request, @CurrentUser() user: UserEntity) {
-    return this.authService.loginUser(req, user);
+  loginUser(
+    @Req() req: Request,
+    @Res() res: Response,
+    @CurrentUser() user: UserEntity,
+  ) {
+    const { access_token, message, expiresInMilliseconds } =
+      this.authService.loginUser(req, user);
+
+    res.cookie('access_token', access_token, {
+      httpOnly: true,
+      secure: serverEnv.isProd,
+      maxAge: expiresInMilliseconds,
+    });
+
+    return res.json({ message });
   }
 
   @ApiBody({ type: [RegisterDto] })

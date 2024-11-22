@@ -1,6 +1,5 @@
 import { createContext, ReactNode, useState } from 'react';
 import { TSong } from '../../types/song.types';
-import { song_mock } from '../../mocks/song.mock';
 
 interface AppContextState {
   state: {
@@ -30,7 +29,7 @@ function PlayerProvider({ children }: { children: ReactNode }) {
     action: K,
     value: (typeof defaultValue.state)[K],
   ) => {
-    setState({ ...state, [action]: value });
+    setState((prevState) => ({ ...prevState, [action]: value }));
   };
 
   return (

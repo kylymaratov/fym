@@ -5,8 +5,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#111828',
-        secondary: '#384152',
+        primary: '#0f0f0f',
+        secondary: '#272727',
       },
       keyframes: {
         starfall: {

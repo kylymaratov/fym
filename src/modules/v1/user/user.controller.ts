@@ -1,4 +1,4 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { UserEntity } from 'src/database/entities/user/user.entity';
 import { CurrentUser } from 'src/decorators/user.decorator';
 import { serverEnv } from 'src/server/server.env';
@@ -22,8 +22,11 @@ export class UserController {
   }
 
   @Get('/song/liked')
-  getLikedSongs(@CurrentUser() user: UserEntity) {
-    return this.userService.getLikedSongs(user);
+  getLikedSongs(
+    @CurrentUser() user: UserEntity,
+    @Query() query: { limit: number },
+  ) {
+    return this.userService.getLikedSongs(user, query.limit);
   }
 
   @Get('/song/recomend')
