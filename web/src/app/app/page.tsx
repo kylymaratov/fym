@@ -19,7 +19,7 @@ interface Components {
   component: any;
 }
 
-async function AppPage() {
+function AppPage() {
   const components: Components[] = useMemo(
     () => [
       {
@@ -59,8 +59,8 @@ async function AppPage() {
       >
         <HomeNavbar />
         <div>
-          {components.map((item) => (
-            <div className="my-10 md:my-14">
+          {components.map((item, key) => (
+            <div className="my-10 md:my-14" key={key}>
               <item.component variant={item.variant} limit={item.limit} />
             </div>
           ))}
