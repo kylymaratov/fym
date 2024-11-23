@@ -50,15 +50,26 @@ function Navigatiion() {
   );
 
   return (
-    <div className="h-full overflow-hidden hidden lg:block xl:block">
-      <div className="bg-secondary w-[300px] px-[30px] py-[37px] rounded-xl h-[74%]">
-        <div className="pointer-events-none select-none">
-          <Image src={LogoIcon} alt="logo" loading="lazy" />
+    <div className="bg-secondary h-full overflow-hidden w-[300px] px-[30px] py-[37px] rounded-xl">
+      <div className="pointer-events-none select-none">
+        <Image src={LogoIcon} alt="logo" loading="lazy" />
+      </div>
+      <div className="mt-[34px]">
+        <span className="uppercase font-bold">discover</span>
+        <div>
+          {discover.map((m) => (
+            <Link href={m.href} key={m.href}>
+              <div className="flex text-sm font-bold items-center my-4 ml-0.5 hover:text-gray-400">
+                <Image src={m.icon} alt={m.title} />
+                <span className="ml-2">{m.title}</span>
+              </div>
+            </Link>
+          ))}
         </div>
-        <div className="mt-[34px]">
-          <span className="uppercase font-bold">discover</span>
+        <div className="mt-[47px]">
+          <span className="uppercase font-bold">library</span>
           <div>
-            {discover.map((m) => (
+            {library.map((m) => (
               <Link href={m.href} key={m.href}>
                 <div className="flex text-sm font-bold items-center my-4 ml-0.5 hover:text-gray-400">
                   <Image src={m.icon} alt={m.title} />
@@ -67,31 +78,17 @@ function Navigatiion() {
               </Link>
             ))}
           </div>
-          <div className="mt-[47px]">
-            <span className="uppercase font-bold">library</span>
-            <div>
-              {library.map((m) => (
-                <Link href={m.href} key={m.href}>
-                  <div className="flex text-sm font-bold items-center my-4 ml-0.5 hover:text-gray-400">
-                    <Image src={m.icon} alt={m.title} />
-                    <span className="ml-2">{m.title}</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-          <div className="mt-[47px]">
-            <span className="uppercase font-bold">your playlists</span>
-            <div>
-              <button type="button" className="flex items-center ml-0.5 mt-4">
-                <Image src={PlusIcon} alt="plus" />
-                <span className="ml-2 text-sm font-bold">Create playlist</span>
-              </button>
-            </div>
+        </div>
+        <div className="mt-[47px]">
+          <span className="uppercase font-bold">your playlists</span>
+          <div>
+            <button type="button" className="flex items-center ml-0.5 mt-4">
+              <Image src={PlusIcon} alt="plus" />
+              <span className="ml-2 text-sm font-bold">Create playlist</span>
+            </button>
           </div>
         </div>
       </div>
-      <div className="bg-secondary w-[300px] px-[30px] py-[37px] rounded-xl h-[34%] mt-5"></div>
     </div>
   );
 }

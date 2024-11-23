@@ -40,7 +40,10 @@ function SongShowCard({ data, withButton }: Props) {
         'PUT',
       );
 
-      console.log(response);
+      if (response.data?.liked) {
+        return toast('Song added to liked songs', { type: 'success' });
+      }
+      toast('Song removed from liked songs', { type: 'warning' });
     } catch (error) {
       if ((error as AxiosError).status == 401) {
         toast('Only authorized users can add to favorites', {
@@ -52,7 +55,7 @@ function SongShowCard({ data, withButton }: Props) {
   }
 
   return (
-    <div className="lg:bg-secondary bg-transparent px-0 lg:px-5 rounded-xl py-0 lg:py-[10px] w-full h-full">
+    <div className="lg:bg-secondary bg-transparent px-0 lg:px-5 rounded-xl py-[10px] w-full h-full">
       <h1 className="font-bold text-lg ml-1">{data.title}</h1>
       <div className="mt-6">
         {data.songs.map((song, key) => (
@@ -87,7 +90,6 @@ function SongShowCard({ data, withButton }: Props) {
             <div className="flex justify-end gap-10">
               <button
                 type="button"
-                className="lg:block hidden"
                 onClick={() => {
                   if (playNow?.song_id === song.song_id) {
                     if (music_player?.paused) {
@@ -110,15 +112,11 @@ function SongShowCard({ data, withButton }: Props) {
                 />
               </button>
 
-              <button
-                type="button"
-                className="lg:block hidden"
-                onClick={() => likeSong(song.song_id)}
-              >
+              <button type="button" onClick={() => likeSong(song.song_id)}>
                 <Image src={LikeIcon} alt="like" />
               </button>
               <span className="text-sm">{formatTime(song.duration)}</span>
-              <button type="button" className="lg:block hidden">
+              <button type="button">
                 <Image src={OptionIcon} alt="option" />
               </button>
             </div>

@@ -12,18 +12,16 @@ import {
   MdRepeat,
   MdOutlineHighQuality,
   MdOutlineQueueMusic,
-  MdFullscreen,
   MdHighQuality,
 } from 'react-icons/md';
 import { LiaDownloadSolid } from 'react-icons/lia';
-
 import { useContext, useEffect, useState } from 'react';
 import RangeLine from './range-line';
 import { PlayerContext } from '@/context/player-context';
 import { SongTypes } from '@/types/song-types';
 import { base_url } from '@/api/base-url';
-import LoadingSpinner from './loading-spinner';
 import LoadingText from './loading-text';
+import { toast } from 'react-toastify';
 
 function MusicPlayer() {
   const [showVolume, setShowVolume] = useState<boolean>(false);
@@ -34,7 +32,6 @@ function MusicPlayer() {
       music_player,
       playNow,
       last_volume,
-      error_message,
       loading,
       loading_progress,
       quality,
@@ -57,13 +54,13 @@ function MusicPlayer() {
   };
 
   const setPlayOrPause = () => {
-    music_player?.paused ? music_player.play() : music_player?.pause();
+    return music_player?.paused ? music_player.play() : music_player?.pause();
   };
 
   const startPlayer = (song: SongTypes): void => {
     if (music_player) {
       try {
-        let audioSource =
+        const audioSource =
           base_url + `/song/listen?songId=${song.song_id}&quality=${quality}`;
 
         setPlayerState('loading_progress', 0);
@@ -88,10 +85,9 @@ function MusicPlayer() {
 
   const handleOnError = (error: string | ErrorEvent) => {
     if (music_player) {
-      if (typeof error === 'string') return;
-      const errorCode = music_player.error?.code;
-
-      console.log(errorCode);
+      if (typeof error === 'string') {
+        toast(error, { type: 'error' });
+      }
     }
   };
 
@@ -168,7 +164,7 @@ function MusicPlayer() {
         </div>
       )}
 
-      <div className="flex lg:justify-between h-[50px] pl-3 pr-3  items-center justify-center mt-2 mb-2">
+      <div className="flex justify-between h-[50px] pl-3 pr-3 items-center mt-2 mb-2">
         <div className="items-center justify-start gap-4 w-[30%] lg:flex hidden">
           {playNow && (
             <>

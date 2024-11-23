@@ -1,7 +1,13 @@
 import { NextResponse, NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const response = NextResponse.next();
+  const userAgent = request.headers.get('user-agent') || '';
+  const isMobileOrTablet = /iPhone|iPad|Android|Mobile|Tablet/i.test(userAgent);
 
-  return response;
+  console.log(userAgent);
+  if (isMobileOrTablet) {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
+
+  return NextResponse.next();
 }

@@ -13,7 +13,6 @@ interface AppContextState {
     quality: 'low' | 'high';
     loading: boolean;
     last_volume: number;
-    error_message: string;
     music_player: null | HTMLAudioElement;
   };
   setPlayerState: <K extends keyof typeof defaultValue.state>(
@@ -31,7 +30,6 @@ const defaultValue: AppContextState = {
     quality: 'high',
     loading: false,
     last_volume: 0,
-    error_message: '',
     music_player: null as HTMLAudioElement | null,
   },
   setPlayerState: () => {},

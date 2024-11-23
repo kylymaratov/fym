@@ -56,7 +56,7 @@ function ProfileBadge({ user, setUserState }: Props) {
         </span>
       </div>
       {isComponentVisible && (
-        <div className="absolute right-0 p-1 w-[200px] rounded-lg bg-secondary">
+        <div className="absolute right-0 p-2 w-[200px] rounded-lg bg-secondary shadow-md shadow-slate-900">
           <div>
             {profile_menu.map((profile) => (
               <Link key={profile.href} href={profile.href}>

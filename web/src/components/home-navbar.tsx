@@ -15,7 +15,7 @@ function HomeNavbar() {
 
   return (
     <div className="px-[21px] py-[19px] hidden lg:block lg:h-[400px] relative overflow-hidden">
-      <div className="absolute w-[35%] bg-black h-[120%] z-20 -top-10 left-20 opacity-100 blur-lg"></div>
+      <div className="absolute w-[35%] bg-[#0f0f0f] h-[120%] z-20 -top-10 left-20 opacity-100 blur-lg"></div>
       {state.playNow ? (
         <img
           src={`https://i.ytimg.com/vi/${state.playNow.song_id}/mqdefault.jpg`}

@@ -21,6 +21,13 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={themeCookie}>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        />
+      </head>
       <RootContext>
         <body>
           {children}
