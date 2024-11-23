@@ -17,9 +17,10 @@ import { toast } from 'react-toastify';
 interface Props {
   data: SongShowCaseTypes;
   withButton?: boolean;
+  numeric?: boolean;
 }
 
-function SongShowCard({ data, withButton }: Props) {
+function SongShowCard({ data, withButton, numeric }: Props) {
   const {
     setPlayerState,
     state: { music_player, playNow },
@@ -55,7 +56,7 @@ function SongShowCard({ data, withButton }: Props) {
   }
 
   return (
-    <div className="lg:bg-secondary bg-transparent px-0 lg:px-5 rounded-xl py-[10px] w-full h-full">
+    <div className="lg:bg-secondary bg-transparent px-2 py-1 lg:px-5 rounded-xl lg:py-3 w-full h-full">
       <h1 className="font-bold text-lg ml-1">{data.title}</h1>
       <div className="mt-6">
         {data.songs.map((song, key) => (
@@ -64,22 +65,24 @@ function SongShowCard({ data, withButton }: Props) {
             className="flex justify-between items-center select-none overflow-hidden p-1"
           >
             <div className="flex items-center justify-start">
-              <span className="text-md font-bold lg:block hidden">
-                #{key + 1}
-              </span>
+              {numeric && (
+                <span className="text-md font-bold lg:block hidden">
+                  #{key + 1}
+                </span>
+              )}
               <img
                 src={`https://i.ytimg.com/vi/${song.song_id}/mqdefault.jpg`}
-                className="rounded-lg w-[55px] h-[55px] object-cover lg:ml-5 ml-0"
+                className={`rounded-lg w-[55px] h-[55px] object-cover ${numeric && 'lg:ml-5 ml-0'}`}
                 loading="lazy"
               />
-              <div className="ml-5">
+              <div className="ml-3 md:ml-5">
                 {song.title ? (
                   <>
                     <p className="text-sm font-bold">
                       {song.title.slice(0, 30)}
                     </p>
                     <p className="text-sm text-gray-400">
-                      {song.artist || song.author}
+                      {song.artist?.slice(0, 30) || song.author?.slice(0, 30)}
                     </p>
                   </>
                 ) : (
@@ -87,7 +90,7 @@ function SongShowCard({ data, withButton }: Props) {
                 )}
               </div>
             </div>
-            <div className="flex justify-end gap-10">
+            <div className="flex justify-end gap-7 xl:gap-10">
               <button
                 type="button"
                 onClick={() => {
@@ -115,7 +118,9 @@ function SongShowCard({ data, withButton }: Props) {
               <button type="button" onClick={() => likeSong(song.song_id)}>
                 <Image src={LikeIcon} alt="like" />
               </button>
-              <span className="text-sm">{formatTime(song.duration)}</span>
+              <span className="text-sm md:block hidden">
+                {formatTime(song.duration)}
+              </span>
               <button type="button">
                 <Image src={OptionIcon} alt="option" />
               </button>

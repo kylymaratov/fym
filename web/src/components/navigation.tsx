@@ -50,7 +50,7 @@ function Navigatiion() {
   );
 
   return (
-    <div className="bg-secondary h-full overflow-hidden w-[300px] px-[30px] py-[37px] rounded-xl">
+    <div className="bg-secondary h-full lg:block hidden overflow-hidden w-[300px] px-[30px] py-[37px] rounded-xl">
       <div className="pointer-events-none select-none">
         <Image src={LogoIcon} alt="logo" loading="lazy" />
       </div>

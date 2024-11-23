@@ -7,7 +7,7 @@ import { Suspense } from 'react';
 
 function SearchPage() {
   return (
-    <div className="relative w-full h-full">
+    <div className="relative lg:py-0 py-5 w-full h-full">
       <Suspense
         fallback={
           <Centered>
@@ -16,7 +16,7 @@ function SearchPage() {
         }
       >
         <SearchNavbar />
-        <div className="my-10">
+        <div className="">
           <SearchResult />
         </div>
         <div className="py-10">

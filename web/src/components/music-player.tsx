@@ -164,8 +164,8 @@ function MusicPlayer() {
         </div>
       )}
 
-      <div className="flex justify-between h-[50px] pl-3 pr-3 items-center mt-2 mb-2">
-        <div className="items-center justify-start gap-4 w-[30%] lg:flex hidden">
+      <div className="flex justify-center md:justify-between h-[50px] pl-3 pr-3 items-center mt-2 mb-2">
+        <div className="items-center justify-start gap-4 w-[30%] md:flex hidden">
           {playNow && (
             <>
               <img
@@ -227,7 +227,7 @@ function MusicPlayer() {
           </button>
         </div>
 
-        <div className="items-center justify-end gap-4 w-[30%] lg:flex hidden">
+        <div className="items-center justify-end gap-4 w-[30%] md:flex hidden">
           <button type="button" className="text-white">
             {quality === 'high' ? (
               <MdHighQuality size={22} />
@@ -274,6 +274,13 @@ function MusicPlayer() {
           </div>
         </div>
       </div>
+      {playNow && (
+        <div className="md:hidden block">
+          <p className="text-sm text-center my-4">
+            Playing : {playNow.original_title}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

@@ -13,7 +13,7 @@ async function MoreAuditionsSongs() {
 
     return (
       <div>
-        <SongShowCard data={topSongsByLikes} withButton />
+        <SongShowCard data={topSongsByLikes} withButton numeric />
       </div>
     );
   } catch (error) {

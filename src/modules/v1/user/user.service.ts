@@ -40,7 +40,7 @@ export class UserService {
   async getRecomendSongs(user: UserEntity) {
     const likedSongs = (await this.getLikedSongs(user)).songs;
 
-    const response = { title: 'Songs for you', songs: [] };
+    const response = { title: 'Best songs for you', songs: [] };
 
     if (!likedSongs.length) return response;
 

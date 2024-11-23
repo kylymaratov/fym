@@ -8,7 +8,6 @@ import { AppContext } from '@/context/app-context';
 import { UseRequest } from '@/hooks/use-request';
 import { base_url } from '@/api/base-url';
 import CloseIcon from '@/assets/icons/close.svg';
-import LoadingSpinner from './loading-spinner';
 import LoadingText from './loading-text';
 
 function SearchField() {
@@ -54,7 +53,7 @@ function SearchField() {
   const isSearchPage = pathname === '/app/search';
 
   return (
-    <div className="flex gap-4 h-full px-4 items-center justify-start border-gray-700 bg-secondary">
+    <div className="flex gap-4 h-full px-4 items-center justify-start rounded-xl border-gray-700 bg-secondary">
       <Image src={SearchIcon} alt="search" />
       <input
         type="text"

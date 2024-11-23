@@ -1,5 +1,11 @@
+import Link from 'next/link';
+
 function HomePage() {
-  return <div>Welcome to songfiy</div>;
+  return (
+    <div>
+      <Link href="/app">Go to Web Player</Link>
+    </div>
+  );
 }
 
 export default HomePage;

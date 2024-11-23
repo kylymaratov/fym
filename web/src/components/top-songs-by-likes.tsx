@@ -4,15 +4,26 @@ import { base_url } from '@/api/base-url';
 import { SongShowCaseTypes } from '@/types/song-types';
 import SongShowCard from './song-show-card';
 import makeSSRRequest from '@/api/ssr-api';
-async function TopSongsByLikes() {
+import SongShowCase from './song-show-case';
+
+interface Props {
+  variant: 'card' | 'case';
+  limit?: number;
+}
+
+async function TopSongsByLikes({ variant, limit = 5 }: Props) {
   try {
     const topSongsByLikes = await makeSSRRequest<SongShowCaseTypes>(
-      base_url + '/song/top-by-likes?limit=5',
+      base_url + `/song/top-by-likes?limit=${limit}`,
     );
 
     return (
       <div>
-        <SongShowCard data={topSongsByLikes} withButton />
+        {variant === 'case' ? (
+          <SongShowCase data={topSongsByLikes} withButton />
+        ) : (
+          <SongShowCard data={topSongsByLikes} withButton numeric />
+        )}
       </div>
     );
   } catch (error) {

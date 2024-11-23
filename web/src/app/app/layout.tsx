@@ -19,7 +19,7 @@ export default async function AppLaylout({
   return (
     <PlayerProvider>
       <div className="w-full m-auto h-screen overflow-hidden grid grid-cols-1 grid-rows-1 pl-1 pr-1">
-        <div className="flex p-7">
+        <div className="flex p-1 lg:p-7">
           <Navigatiion />
           <div className="flex-grow-1 overflow-auto w-full px-[10px] lg:px-[29px]">
             {children}

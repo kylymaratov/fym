@@ -88,9 +88,8 @@ export class SongController {
 
     if (start === 0) {
       this.songService.icnListenCount(query.songId);
+      this.songService.addRecentlyPlays(req, query.songId);
     }
-
-    this.songService.addRecentlyPlays(req, query.songId);
   }
 
   @Post('search')

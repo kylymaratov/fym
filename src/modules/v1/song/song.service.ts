@@ -99,13 +99,13 @@ export class SongService {
   async getTopSongsByLike(limit: number = 10) {
     const result = await this.songDatabaseService.findTopSongsByLike(limit);
 
-    return { title: 'Top Songs', songs: result };
+    return { title: `Top ${limit} songs by likes`, songs: result };
   }
 
   async getMoreAuidionsSongs(limit: number = 10) {
     const result = await this.songDatabaseService.findMoreAuidionsSongs(limit);
 
-    return { title: 'Top listened songs', songs: result };
+    return { title: `Top ${limit} listened songs`, songs: result };
   }
 
   addRecentlyPlays(req: Request, song_id: string) {
@@ -115,25 +115,23 @@ export class SongService {
         return;
       }
 
-      if (req.session.recently_plays.length > 50) {
-        req.session.recently_plays.splice(0, 10);
+      if (req.session.recently_plays.length >= 40) {
+        req.session.recently_plays.pop();
       }
 
       if (req.session.recently_plays.includes(song_id)) {
         const index = req.session.recently_plays.indexOf(song_id);
-
         req.session.recently_plays.splice(index, 1);
-
-        req.session.recently_plays.push(song_id);
-        return;
       }
 
-      req.session.recently_plays.push(song_id);
-    } catch {}
+      req.session.recently_plays.unshift(song_id);
+    } catch (error) {
+      console.error('Error updating recently played songs:', error);
+    }
   }
 
   async getRecentlySongs(recently_plays: string[], limit: number = 20) {
-    const limitedRecentlyPlays = recently_plays.slice(0, limit).reverse();
+    const limitedRecentlyPlays = recently_plays.slice(0, limit);
 
     const songs = await Promise.all(
       limitedRecentlyPlays.map((recently) =>
