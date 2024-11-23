@@ -6,17 +6,13 @@ import { UserTypes } from '@/types/user-types';
 
 interface Props {
   children: ReactNode;
-  user?: UserTypes;
 }
 
-function RootContext({ children, user }: Props) {
-  const providers = useMemo(
-    () => [UserProvier, AppProvider, PlayerProvider],
-    [],
-  );
+function RootContext({ children }: Props) {
+  const providers = useMemo(() => [UserProvier, AppProvider], []);
 
   return providers.reduceRight(
-    (acc, Provider) => <Provider user={user}>{acc}</Provider>,
+    (acc, Provider) => <Provider>{acc}</Provider>,
     children,
   );
 }

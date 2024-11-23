@@ -4,7 +4,7 @@ import '@/styles/globals.css';
 import 'react-toastify/dist/ReactToastify.css';
 import MusicPlayer from '@/components/music-player';
 import Navigatiion from '@/components/navigation';
-import { headers } from 'next/headers';
+import { PlayerProvider } from '@/context/player-context';
 
 export const metadata: Metadata = {
   title: 'Songfiy application',
@@ -16,20 +16,17 @@ export default async function AppLaylout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const currentHeaders = await headers();
-  const host = currentHeaders.get('host');
-  const url = currentHeaders.get('referer') || '/';
-  const pathWithoutDomain = new URL(url, `http://${host}`).pathname;
-
   return (
-    <div className=" w-full m-auto h-screen overflow-hidden grid grid-cols-1 grid-rows-1 pl-1 pr-1">
-      <div className="flex p-7">
-        <Navigatiion />
-        <div className="flex-grow-1 overflow-auto w-full px-[29px]">
-          {children}
+    <PlayerProvider>
+      <div className="w-full m-auto h-screen overflow-hidden grid grid-cols-1 grid-rows-1 pl-1 pr-1">
+        <div className="flex p-0 lg:p-7">
+          <Navigatiion />
+          <div className="flex-grow-1 overflow-auto w-full px-[10px] lg:px-[29px]">
+            {children}
+          </div>
         </div>
+        <MusicPlayer />
       </div>
-      {pathWithoutDomain?.startsWith('/app') && <MusicPlayer />}
-    </div>
+    </PlayerProvider>
   );
 }

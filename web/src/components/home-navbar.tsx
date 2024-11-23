@@ -14,7 +14,7 @@ function HomeNavbar() {
   const userContext = useContext(UserContext);
 
   return (
-    <div className="px-[21px] py-[19px] h-[400px] relative overflow-hidden">
+    <div className="px-[21px] py-[19px] hidden lg:block lg:h-[400px] relative overflow-hidden">
       <div className="absolute w-[35%] bg-black h-[120%] z-20 -top-10 left-20 opacity-100 blur-lg"></div>
       {state.playNow ? (
         <img

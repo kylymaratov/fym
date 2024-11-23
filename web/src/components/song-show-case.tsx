@@ -21,7 +21,10 @@ interface Props {
 }
 
 function SongShowCase({ data, withButton }: Props) {
-  const { setPlayerState, state } = useContext(PlayerContext);
+  const {
+    setPlayerState,
+    state: { music_player, playNow },
+  } = useContext(PlayerContext);
   const swiperRef = useRef<SwiperClass | null>(null);
 
   return (
@@ -79,11 +82,11 @@ function SongShowCase({ data, withButton }: Props) {
               type="button"
               className="absolute right-4 bottom-4"
               onClick={() => {
-                if (state.playNow?.song_id === song.song_id) {
-                  if (state.audioRef?.paused) {
-                    state.audioRef?.play();
+                if (playNow?.song_id === song.song_id) {
+                  if (music_player?.paused) {
+                    music_player?.play();
                   } else {
-                    state.audioRef?.pause();
+                    music_player?.pause();
                   }
                 } else {
                   setPlayerState('playNow', song);
@@ -92,8 +95,7 @@ function SongShowCase({ data, withButton }: Props) {
             >
               <Image
                 src={
-                  state.playNow?.song_id === song.song_id &&
-                  !state.audioRef?.paused
+                  playNow?.song_id === song.song_id && !music_player?.paused
                     ? PauseIcon
                     : PlayIcon
                 }

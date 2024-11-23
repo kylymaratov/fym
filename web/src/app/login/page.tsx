@@ -3,7 +3,7 @@
 import * as Yup from 'yup';
 import { Formik, Field, Form } from 'formik';
 
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Centered } from '@/components/centered';
 import { UseRequest } from '@/hooks/use-request';
 import { UserContext } from '@/context/user-context';
@@ -19,7 +19,7 @@ interface InitialValues {
 export default function LoginPage() {
   const { request } = UseRequest();
   const [rememberMe, setRememberMe] = useState<boolean>(true);
-  const { setUserState } = useContext(UserContext);
+  const { setUserState, state } = useContext(UserContext);
   const router = useRouter();
 
   const validationSchema = Yup.object({
@@ -39,15 +39,10 @@ export default function LoginPage() {
       const response = await request(
         '/auth/login',
         'POST',
-        JSON.stringify(values),
+        JSON.stringify({ ...values, rememberMe }),
       );
 
-      if (rememberMe) {
-        localStorage.setItem('access_token', response.data?.access_token);
-      }
-
-      setUserState('access_token', response.data?.access_token);
-
+      setUserState('check_auth', true);
       toast(response.data?.message, { type: 'success' });
       router.push('/app');
     } catch (error) {
@@ -55,6 +50,10 @@ export default function LoginPage() {
       fn.resetForm();
     }
   };
+
+  useEffect(() => {
+    if (state.user) return router.push('/app');
+  }, [state.user]);
 
   return (
     <Centered>
@@ -137,6 +136,11 @@ export default function LoginPage() {
             create
           </Link>
         </p>
+        {state.user && (
+          <div className="text-center italic my-5">
+            You are already logged in, you will be redirected ...
+          </div>
+        )}
       </div>
     </Centered>
   );

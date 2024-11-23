@@ -7,6 +7,8 @@ import { Centered } from '@/components/centered';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import { useContext, useEffect } from 'react';
+import { UserContext } from '@/context/user-context';
 
 interface InitialValues {
   email: string;
@@ -17,6 +19,7 @@ interface InitialValues {
 export default function SignupPage() {
   const { request } = UseRequest();
   const router = useRouter();
+  const { state } = useContext(UserContext);
 
   const validationSchema = Yup.object({
     name: Yup.string().required('Name is required'),
@@ -48,9 +51,18 @@ export default function SignupPage() {
     }
   };
 
+  useEffect(() => {
+    if (state.user) return router.push('/app');
+  }, [state.user]);
+
   return (
     <Centered>
       <div className="p-7 w-full md:w-1/2 xl:w-1/4 lg:w-1/3 xl:dark:bg-secondary rounded-xl">
+        {state.user && (
+          <div className="text-center italic my-3">
+            You are already logged in, you will be redirected ...
+          </div>
+        )}
         <h2 className="text-center font-bold text-2xl">Create account</h2>
         <p className="mt-5 mb-5 text-sm text-center">
           Create an account and listen to your favorite songs without
@@ -134,6 +146,11 @@ export default function SignupPage() {
             login
           </Link>
         </p>
+        {state.user && (
+          <div className="text-center italic my-5">
+            You are already logged in, you will be redirected ...
+          </div>
+        )}
       </div>
     </Centered>
   );

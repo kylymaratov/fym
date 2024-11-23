@@ -1,15 +1,12 @@
 'use client';
 
 import { SongTypes } from '@/types/song-types';
+import { usePathname } from 'next/navigation';
 import { createContext, ReactNode, useEffect, useState } from 'react';
 
 interface AppContextState {
   state: {
     playNow: SongTypes | null;
-    currentTime: number;
-    duration: number;
-    volume: number;
-    paused: boolean;
     repeat: boolean;
     shuffle: boolean;
     loading_progress: number;
@@ -17,11 +14,7 @@ interface AppContextState {
     loading: boolean;
     last_volume: number;
     error_message: string;
-    times: {
-      start: string;
-      end: string;
-    };
-    audioRef: HTMLAudioElement | null;
+    music_player: null | HTMLAudioElement;
   };
   setPlayerState: <K extends keyof typeof defaultValue.state>(
     action: K,
@@ -32,10 +25,6 @@ interface AppContextState {
 const defaultValue: AppContextState = {
   state: {
     playNow: null,
-    currentTime: 0,
-    duration: 0,
-    volume: 70,
-    paused: true,
     repeat: false,
     shuffle: false,
     loading_progress: 0,
@@ -43,11 +32,7 @@ const defaultValue: AppContextState = {
     loading: false,
     last_volume: 0,
     error_message: '',
-    times: {
-      start: '00:00',
-      end: '00:00',
-    },
-    audioRef: null,
+    music_player: null as HTMLAudioElement | null,
   },
   setPlayerState: () => {},
 };
@@ -59,21 +44,21 @@ function PlayerProvider({ children }: { children: ReactNode }) {
     defaultValue.state,
   );
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setState((prevState) => ({
-        ...prevState,
-        audioRef: new Audio(),
-      }));
-    }
-  }, []);
-
   const setPlayerState = <K extends keyof typeof defaultValue.state>(
     action: K,
     value: (typeof defaultValue.state)[K],
   ) => {
     setState((prevState) => ({ ...prevState, [action]: value }));
   };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setState((prevState) => ({
+        ...prevState,
+        music_player: new Audio(),
+      }));
+    }
+  }, []);
 
   return (
     <PlayerContext.Provider value={{ state, setPlayerState }}>

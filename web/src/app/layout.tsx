@@ -4,7 +4,6 @@ import '@/styles/globals.css';
 import RootContext from '@/context';
 import { cookies } from 'next/headers';
 import { Flip, ToastContainer } from 'react-toastify';
-import UserAuth from '@/utils/user-auth';
 import 'react-toastify/dist/ReactToastify.css';
 
 export const metadata: Metadata = {
@@ -17,13 +16,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await UserAuth();
   const cookieStore = await cookies();
   const themeCookie = cookieStore.get('theme')?.value || 'dark';
 
   return (
     <html lang="en" className={themeCookie}>
-      <RootContext user={user}>
+      <RootContext>
         <body>
           {children}
           <ToastContainer

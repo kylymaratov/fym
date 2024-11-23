@@ -61,7 +61,7 @@ function RangeLine({
         rangeRect.width,
       );
       const newValue = (newLeft / rangeRect.width) * max;
-      onChange(Math.floor(newValue));
+      onChange(newValue);
     }
   };
 

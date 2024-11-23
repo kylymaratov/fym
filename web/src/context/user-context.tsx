@@ -1,12 +1,14 @@
 'use client';
 
+import { base_url } from '@/api/base-url';
+import { UseRequest } from '@/hooks/use-request';
 import { UserTypes } from '@/types/user-types';
-import { createContext, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useEffect, useState } from 'react';
 
 interface UserContextState {
   state: {
     user: UserTypes | null;
-    access_token: string;
+    check_auth: boolean;
   };
   setUserState: <K extends keyof typeof defaultValue.state>(
     action: K,
@@ -17,24 +19,29 @@ interface UserContextState {
 const defaultValue: UserContextState = {
   state: {
     user: null,
-    access_token: '',
+    check_auth: false,
   },
   setUserState: () => {},
 };
 
 const UserContext = createContext<UserContextState>(defaultValue);
 
-function UserProvier({
-  children,
-  user,
-}: {
-  children: ReactNode;
-  user?: UserTypes;
-}) {
-  const [state, setState] = useState<typeof defaultValue.state>({
-    ...defaultValue.state,
-    user: user || null,
-  });
+function UserProvier({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<typeof defaultValue.state>(
+    defaultValue.state,
+  );
+  const { request } = UseRequest();
+
+  const fetchUser = async () => {
+    try {
+      const { data } = await request<UserTypes>(base_url + '/user/me');
+      setState((prevState) => ({ ...prevState, user: data || null }));
+    } catch {}
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, [state.check_auth]);
 
   const setUserState = <K extends keyof typeof defaultValue.state>(
     action: K,

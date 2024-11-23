@@ -9,6 +9,7 @@ import { UseRequest } from '@/hooks/use-request';
 import { base_url } from '@/api/base-url';
 import CloseIcon from '@/assets/icons/close.svg';
 import LoadingSpinner from './loading-spinner';
+import LoadingText from './loading-text';
 
 function SearchField() {
   const pathname = usePathname();
@@ -63,7 +64,7 @@ function SearchField() {
         onChange={(event) => setSearchText(event.target.value)}
         value={searchText}
       />
-      {loading && <LoadingSpinner />}
+      {loading && <LoadingText />}
       {isSearchPage && searchText && (
         <button type="button" onClick={resetSearch}>
           <Image src={CloseIcon} alt="close" />

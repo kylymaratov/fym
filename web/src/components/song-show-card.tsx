@@ -11,6 +11,8 @@ import OptionIcon from '@/assets/icons/option.svg';
 import PauseIcon from '@/assets/icons/pause.svg';
 import { UseRequest } from '@/hooks/use-request';
 import { base_url } from '@/api/base-url';
+import { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
 
 interface Props {
   data: SongShowCaseTypes;
@@ -18,7 +20,10 @@ interface Props {
 }
 
 function SongShowCard({ data, withButton }: Props) {
-  const { setPlayerState, state } = useContext(PlayerContext);
+  const {
+    setPlayerState,
+    state: { music_player, playNow },
+  } = useContext(PlayerContext);
   const { request } = UseRequest();
 
   function formatTime(seconds: number): string {
@@ -36,11 +41,18 @@ function SongShowCard({ data, withButton }: Props) {
       );
 
       console.log(response);
-    } catch (error) {}
+    } catch (error) {
+      if ((error as AxiosError).status == 401) {
+        toast('Only authorized users can add to favorites', {
+          position: 'top-right',
+          type: 'error',
+        });
+      }
+    }
   }
 
   return (
-    <div className="bg-secondary px-5 rounded-xl py-[10px] w-full h-full">
+    <div className="lg:bg-secondary bg-transparent px-0 lg:px-5 rounded-xl py-0 lg:py-[10px] w-full h-full">
       <h1 className="font-bold text-lg ml-1">{data.title}</h1>
       <div className="mt-6">
         {data.songs.map((song, key) => (
@@ -49,10 +61,12 @@ function SongShowCard({ data, withButton }: Props) {
             className="flex justify-between items-center select-none overflow-hidden p-1"
           >
             <div className="flex items-center justify-start">
-              <span className="text-md font-bold">#{key + 1}</span>
+              <span className="text-md font-bold lg:block hidden">
+                #{key + 1}
+              </span>
               <img
                 src={`https://i.ytimg.com/vi/${song.song_id}/mqdefault.jpg`}
-                className=" rounded-lg w-[55px] h-[55px] object-cover ml-5"
+                className="rounded-lg w-[55px] h-[55px] object-cover lg:ml-5 ml-0"
                 loading="lazy"
               />
               <div className="ml-5">
@@ -73,12 +87,13 @@ function SongShowCard({ data, withButton }: Props) {
             <div className="flex justify-end gap-10">
               <button
                 type="button"
+                className="lg:block hidden"
                 onClick={() => {
-                  if (state.playNow?.song_id === song.song_id) {
-                    if (state.audioRef?.paused) {
-                      state.audioRef?.play();
+                  if (playNow?.song_id === song.song_id) {
+                    if (music_player?.paused) {
+                      music_player?.play();
                     } else {
-                      state.audioRef?.pause();
+                      music_player?.pause();
                     }
                   } else {
                     setPlayerState('playNow', song);
@@ -87,8 +102,7 @@ function SongShowCard({ data, withButton }: Props) {
               >
                 <Image
                   src={
-                    state.playNow?.song_id === song.song_id &&
-                    !state.audioRef?.paused
+                    playNow?.song_id === song.song_id && !music_player?.paused
                       ? PauseIcon
                       : PlayIcon
                   }
@@ -96,11 +110,15 @@ function SongShowCard({ data, withButton }: Props) {
                 />
               </button>
 
-              <button type="button" onClick={() => likeSong(song.song_id)}>
+              <button
+                type="button"
+                className="lg:block hidden"
+                onClick={() => likeSong(song.song_id)}
+              >
                 <Image src={LikeIcon} alt="like" />
               </button>
               <span className="text-sm">{formatTime(song.duration)}</span>
-              <button type="button">
+              <button type="button" className="lg:block hidden">
                 <Image src={OptionIcon} alt="option" />
               </button>
             </div>

@@ -12,7 +12,7 @@ const MoreAuditionsSongs = lazy(
 );
 const TopSongsByLikes = lazy(() => import('@/components/top-songs-by-likes'));
 
-async function HomePage() {
+async function AppPage() {
   return (
     <div className="relative w-full h-full">
       <Suspense
@@ -27,11 +27,11 @@ async function HomePage() {
           <RecentlyPlaySongs />
         </div>
 
-        <div className="flex mt-10 gap-4 justify-center w-full">
-          <div className="w-[50%]  overflow-hidden">
+        <div className="block xl:flex mt-10 gap-4 justify-center w-full">
+          <div className="xl:w-[50%]  overflow-hidden">
             <TopSongsByLikes />
           </div>
-          <div className="w-[50%]  overflow-hidden">
+          <div className="xl:w-[50%]  overflow-hidden">
             <MoreAuditionsSongs />
           </div>
         </div>
@@ -43,4 +43,4 @@ async function HomePage() {
   );
 }
 
-export default HomePage;
+export default AppPage;
