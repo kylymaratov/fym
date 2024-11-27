@@ -4,14 +4,9 @@ import { createContext, ReactNode, useEffect, useState } from 'react';
 interface PlayerContextState {
   state: {
     playNow: SongTypes | null;
-    repeat: boolean;
-    shuffle: boolean;
-    loadingProgress: number;
-    quality: 'low' | 'high';
-    loading: boolean;
-    lastVolume: number;
-    musicPlayer: HTMLAudioElement;
+    playing: boolean;
     playNext: SongTypes[];
+    playingTrigger: boolean;
   };
   setPlayerState: <K extends keyof typeof defaultValue.state>(
     action: K,
@@ -22,14 +17,9 @@ interface PlayerContextState {
 const defaultValue: PlayerContextState = {
   state: {
     playNow: null,
-    repeat: false,
-    shuffle: false,
-    loadingProgress: 0,
-    quality: 'high',
-    loading: false,
-    lastVolume: 0,
-    musicPlayer: new Audio(),
+    playing: false,
     playNext: [],
+    playingTrigger: false,
   },
   setPlayerState: () => {},
 };

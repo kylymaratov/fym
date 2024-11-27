@@ -11,7 +11,7 @@ import {
   MdOutlineQueueMusic,
 } from 'react-icons/md';
 import { LiaDownloadSolid } from 'react-icons/lia';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import RangeLine from '@/components/RangeLine';
 import { toast } from 'react-toastify';
 import { PlayerContext } from '@/context/PlayerContext';
@@ -21,44 +21,52 @@ import LoadingText from '@/components/LoadingText';
 import UseVisible from '@/hooks/UseVisible';
 
 function MusicPlayer() {
-  const [showVolume, setShowVolume] = useState<boolean>(false);
   const [expandRange, setExpandRange] = useState<boolean>(false);
+  const [
+    { repeat, shuffle, loadingProgress, loading, lastVolume },
+    setMusicState,
+  ] = useState({
+    repeat: false,
+    shuffle: false,
+    loadingProgress: 0,
+    loading: false,
+    lastVolume: 0,
+  });
+  const musicPlayer = useRef<HTMLAudioElement>(new Audio());
+
   const queueComp = UseVisible(false);
   const {
-    state: {
-      musicPlayer,
-      playNow,
-      lastVolume,
-      loading,
-      loadingProgress,
-      quality,
-      repeat,
-      shuffle,
-      playNext,
-    },
+    state: { playNow, playNext, playingTrigger },
     setPlayerState,
   } = useContext(PlayerContext);
 
   const setVolumeOnClick = (incomingVolume: number): void => {
-    musicPlayer.volume = incomingVolume / 100;
+    musicPlayer.current.volume = incomingVolume / 100;
   };
 
   const setCurrentTimeOnClick = (incomingTime: number): void => {
-    musicPlayer.currentTime = incomingTime;
+    musicPlayer.current.currentTime = incomingTime;
   };
 
   const setPlayOrPause = () => {
-    return musicPlayer?.paused ? musicPlayer.play() : musicPlayer?.pause();
+    if (playNow) {
+      if (musicPlayer.current.paused) {
+        musicPlayer.current.play();
+        setPlayerState('playing', true);
+      } else {
+        musicPlayer.current.pause();
+        setPlayerState('playing', false);
+      }
+    }
   };
 
   const startPlayer = (song: SongTypes): void => {
     try {
-      const audioSource =
-        baseUrl + `/song/listen?songId=${song.song_id}&quality=${quality}`;
+      const audioSource = baseUrl + `/song/listen?songId=${song.song_id}`;
 
-      setPlayerState('loadingProgress', 0);
-      setPlayerState('loading', true);
-      musicPlayer.src = audioSource;
+      setMusicState((prev) => ({ ...prev, loadingProgress: 0, loading: true }));
+
+      musicPlayer.current.src = audioSource;
       setPlayOrPause();
     } catch (e) {
       alert((e as Error).message);
@@ -85,15 +93,19 @@ function MusicPlayer() {
 
   const handleTimeUpdate = (): void => {
     const progress: number =
-      musicPlayer.buffered.length > 0
-        ? (musicPlayer.buffered.end(0) / musicPlayer.duration) * 100
+      musicPlayer.current.buffered.length > 0
+        ? (musicPlayer.current.buffered.end(0) / musicPlayer.current.duration) *
+          100
         : 0;
-    setPlayerState('loadingProgress', Math.floor(progress));
+    setMusicState((prev) => ({
+      ...prev,
+      loadingProgress: Math.floor(progress),
+    }));
   };
 
   const handleEnded = () => {
     if (repeat) {
-      return musicPlayer.play();
+      return musicPlayer.current.play();
     }
 
     nextSong();
@@ -119,21 +131,24 @@ function MusicPlayer() {
   };
 
   const handleVolumeMuted = () => {
-    if (musicPlayer.volume === 0) {
-      musicPlayer.volume = lastVolume;
+    if (musicPlayer.current.volume === 0) {
+      musicPlayer.current.volume = lastVolume;
     } else {
-      setPlayerState('lastVolume', musicPlayer.volume);
-      musicPlayer.volume = 0;
+      setMusicState((prev) => ({
+        ...prev,
+        lastVolume: musicPlayer.current.volume,
+      }));
+      musicPlayer.current.volume = 0;
     }
   };
 
   useEffect(() => {
-    musicPlayer.autoplay = false;
-    musicPlayer.onerror = handleOnError as OnErrorEventHandler;
-    musicPlayer.ontimeupdate = handleTimeUpdate;
-    musicPlayer.onended = handleEnded;
-    musicPlayer.onloadedmetadata = () => {
-      setPlayerState('loading', false);
+    musicPlayer.current.autoplay = false;
+    musicPlayer.current.onerror = handleOnError as OnErrorEventHandler;
+    musicPlayer.current.ontimeupdate = handleTimeUpdate;
+    musicPlayer.current.onended = handleEnded;
+    musicPlayer.current.onloadedmetadata = () => {
+      setMusicState((prev) => ({ ...prev, loading: false }));
     };
   }, [musicPlayer, playNow]);
 
@@ -145,11 +160,15 @@ function MusicPlayer() {
 
   useEffect(() => {
     return () => {
-      musicPlayer.pause();
-      musicPlayer.src = '';
+      musicPlayer.current.pause();
+      musicPlayer.current.src = '';
       setPlayerState('playNow', null);
     };
   }, []);
+
+  useEffect(() => {
+    setPlayOrPause();
+  }, [playingTrigger]);
 
   if (!musicPlayer) return;
 
@@ -164,13 +183,16 @@ function MusicPlayer() {
           className={`duration-200 relative ${expandRange ? 'h-3.5' : 'h-1'}`}
         >
           <RangeLine
-            current={(musicPlayer.currentTime / musicPlayer.duration) * 100}
-            max={musicPlayer.duration}
+            current={
+              (musicPlayer.current.currentTime / musicPlayer.current.duration) *
+              100
+            }
+            max={musicPlayer.current.duration}
             onChange={setCurrentTimeOnClick}
             progress={loadingProgress}
             times={{
-              start: formatMilliseconds(musicPlayer.currentTime * 1000),
-              end: formatMilliseconds(musicPlayer.duration * 1000),
+              start: formatMilliseconds(musicPlayer.current.currentTime * 1000),
+              end: formatMilliseconds(musicPlayer.current.duration * 1000),
             }}
             expandRange={expandRange}
           />
@@ -217,15 +239,17 @@ function MusicPlayer() {
         >
           <button
             type="button"
-            onClick={() => setPlayerState('shuffle', !shuffle)}
+            onClick={() =>
+              setMusicState((prev) => ({ ...prev, shuffle: !shuffle }))
+            }
           >
-            <MdShuffle size={22} />
+            <MdRepeat size={22} color={shuffle ? 'green' : 'white'} />
           </button>
           <button type="button" disabled={!playNow} onClick={prevSong}>
             <MdOutlineSkipPrevious size={22} />
           </button>
           <button type="button" onClick={setPlayOrPause} disabled={!playNow}>
-            {musicPlayer.paused ? (
+            {musicPlayer.current.paused ? (
               <FaPlayCircle size={28} />
             ) : (
               <FaPauseCircle size={28} />
@@ -236,9 +260,11 @@ function MusicPlayer() {
           </button>
           <button
             type="button"
-            onClick={() => setPlayerState('repeat', !repeat)}
+            onClick={() =>
+              setMusicState((prev) => ({ ...prev, repeat: !repeat }))
+            }
           >
-            <MdRepeat size={22} />
+            <MdRepeat size={22} color={repeat ? 'green' : 'white'} />
           </button>
         </div>
 
@@ -256,34 +282,24 @@ function MusicPlayer() {
             <LiaDownloadSolid size={22} />
           </button>
 
-          <div
-            className="flex items-center gap-2"
-            onMouseEnter={() => setShowVolume(true)}
-            onMouseLeave={() => {
-              setShowVolume(false);
-            }}
-          >
+          <div className="flex items-center gap-2">
             <button
               type="button"
               className="text-white"
               onClick={handleVolumeMuted}
             >
-              {musicPlayer.volume === 0 ? (
+              {musicPlayer.current.volume === 0 ? (
                 <MdVolumeOff size={22} />
-              ) : musicPlayer.volume >= 70 ? (
+              ) : musicPlayer.current.volume >= 70 ? (
                 <MdVolumeUp size={22} />
               ) : (
                 <MdVolumeDown size={22} />
               )}
             </button>
-            <div
-              className={`duration-200 ${
-                showVolume ? 'h-2 w-[70px]' : 'h-0 w-0'
-              }`}
-            >
+            <div className="h-2 w-[70px]">
               <RangeLine
                 max={100}
-                current={musicPlayer.volume * 100}
+                current={musicPlayer.current.volume * 100}
                 onChange={setVolumeOnClick}
               />
             </div>

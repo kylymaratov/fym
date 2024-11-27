@@ -1,7 +1,6 @@
 import { useContext, useState } from 'react';
 import 'swiper/css';
 import PlayIcon from '@/assets/icons/play.svg';
-import LikeIcon from '@/assets/icons/like.svg';
 import OptionIcon from '@/assets/icons/option.svg';
 import PauseIcon from '@/assets/icons/pause.svg';
 import { PlayerContext } from '@/context/PlayerContext';
@@ -50,7 +49,7 @@ export const SongItem: React.FC<SongItemProps> = ({ song, numeric }) => {
   const showOptions = UseVisible(false);
   const {
     setPlayerState,
-    state: { musicPlayer, playNow },
+    state: { playNow, playing },
   } = useContext(PlayerContext);
 
   function formatTime(seconds: number): string {
@@ -62,11 +61,6 @@ export const SongItem: React.FC<SongItemProps> = ({ song, numeric }) => {
 
   function playSong(song: SongTypes) {
     if (playNow?.song_id === song.song_id) {
-      if (musicPlayer?.paused) {
-        musicPlayer?.play();
-      } else {
-        musicPlayer?.pause();
-      }
     } else {
       setPlayerState('playNow', song);
     }
@@ -102,7 +96,7 @@ export const SongItem: React.FC<SongItemProps> = ({ song, numeric }) => {
         <button type="button" onClick={() => playSong(song)}>
           <img
             src={
-              playNow?.song_id === song.song_id && !musicPlayer?.paused
+              playNow?.song_id === song.song_id && playing
                 ? PauseIcon
                 : PlayIcon
             }

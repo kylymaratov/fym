@@ -87,14 +87,14 @@ function RangeLine({
       <div
         ref={thumbRef}
         onMouseDown={handleMouseDown}
-        className="absolute h-full w-[10px] bg-gradient-to-br from-cyan-500 to-blue-500 transition-all duration-300 z-30"
+        className="absolute h-full w-[10px] bg-gradient-to-br from-cyan-500 to-blue-500   z-30"
       ></div>
       <div
-        className="absolute top-0 left-0 h-full bg-gradient-to-br from-cyan-500 to-blue-500 transition-all duration-300 z-30"
+        className="absolute top-0 left-0 h-full bg-gradient-to-br from-cyan-500 to-blue-500   z-30"
         style={{ width: `${showTooltip ? tempValue : current}%` }}
       ></div>
       <div
-        className="absolute top-0 left-0 h-full bg-gray-500 transition-all duration-300 z-10"
+        className="absolute top-0 left-0 h-full bg-gray-500   z-10"
         style={{ width: `${progress}%` }}
       ></div>
     </div>

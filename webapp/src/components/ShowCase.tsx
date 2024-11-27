@@ -20,24 +20,25 @@ interface Props {
 function ShowCase({ data, toMore, roundedFull }: Props) {
   const {
     setPlayerState,
-    state: { musicPlayer, playNow, playNext },
+    state: { playing, playNow },
   } = useContext(PlayerContext);
   const swiperRef = useRef<SwiperClass | null>(null);
 
   function playSong(song: SongTypes) {
     if (playNow?.song_id === song.song_id) {
-      if (musicPlayer?.paused) {
-        musicPlayer?.play();
+      if (playing) {
+        setPlayerState('playingTrigger', true);
       } else {
-        musicPlayer?.pause();
+        setPlayerState('playingTrigger', false);
       }
     } else {
       setPlayerState('playNow', song);
-      if (data.title && !playNext.length) {
-        setPlayerState('playNext', data.songs);
-      }
     }
   }
+
+  const openContextMenu = () => {
+    console.log(1);
+  };
 
   if (!data.songs.length) return;
 
@@ -72,8 +73,9 @@ function ShowCase({ data, toMore, roundedFull }: Props) {
       >
         {data.songs.map((song) => (
           <SwiperSlide
+            onContextMenu={openContextMenu}
             key={song.song_id}
-            style={{ width: '240px', height: '260px' }}
+            style={{ width: '220px', height: '240px' }}
             className="select-none bg-transparent group overflow-hidden hover:shadow-lg justify-center hover:bg-hover hover:shadow-hover flex items-center"
           >
             <div className="relative">
@@ -81,24 +83,26 @@ function ShowCase({ data, toMore, roundedFull }: Props) {
                 <img
                   loading="lazy"
                   src={`https://i.ytimg.com/vi/${song.song_id}/mqdefault.jpg`}
-                  className={`w-[220px] h-[210px] object-cover duration-200 opacity-90 hover:opacity-100 shadow-lg shadow-black ${
+                  className={`w-[200px] h-[210px] m-auto object-cover duration-200 opacity-90 hover:opacity-100 shadow-lg shadow-black ${
                     roundedFull ? 'rounded-full' : 'rounded-lg'
                   }`}
                 />
               </Link>
 
-              <img
-                src={LogoIcon}
-                className="absolute top-2 left-2 opacity-70"
-              />
+              {!roundedFull && (
+                <img
+                  src={LogoIcon}
+                  className="absolute top-2 left-2 opacity-70"
+                />
+              )}
               <button
                 type="button"
-                className="absolute right-1 bottom-12 bg-orange-500 p-5 rounded-full hidden group-hover:block"
+                className="absolute right-2 bottom-14 bg-orange-500 p-4 rounded-full hidden group-hover:block"
                 onClick={() => playSong(song)}
               >
                 <img
                   src={
-                    playNow?.song_id === song.song_id && !musicPlayer?.paused
+                    playNow?.song_id === song.song_id && playing
                       ? PauseIcon
                       : PlayIcon
                   }

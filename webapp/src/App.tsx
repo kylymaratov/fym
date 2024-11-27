@@ -16,7 +16,7 @@ function App() {
   };
 
   return (
-    <div onContextMenu={handleContextMenu}>
+    <div onContextMenu={handleContextMenu} className="select-none">
       {routes}
       <ToastContainer
         position="bottom-right"

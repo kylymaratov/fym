@@ -7,10 +7,7 @@ interface Props {
 }
 
 function RootContext({ children }: Props) {
-  const providers = useMemo(
-    () => [UserProvider, AppProvider, UserProvider],
-    [],
-  );
+  const providers = useMemo(() => [UserProvider, AppProvider], []);
 
   return providers.reduceRight(
     (acc, Provider) => <Provider>{acc}</Provider>,

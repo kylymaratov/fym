@@ -42,6 +42,7 @@ export const HomePage = () => {
     {
       href: '/recomendations',
       data: recomendationSongs,
+      roundedFull: true,
     },
     {
       href: '/top-by-likes',
