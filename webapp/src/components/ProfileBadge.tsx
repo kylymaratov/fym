@@ -44,7 +44,7 @@ function ProfileBadge({ user, setUserState }: Props) {
   return (
     <div className="relative" ref={ref}>
       <div
-        className="w-[44px] h-[44px] bg-slate-600 flex justify-center items-center rounded-full cursor-pointer"
+        className="w-[44px] h-[44px] bg-red-600 flex justify-center items-center rounded-full cursor-pointer"
         onClick={() => setIsComponentVisible(!isComponentVisible)}
       >
         <span className="uppercase text-fond text-lg">
@@ -54,18 +54,18 @@ function ProfileBadge({ user, setUserState }: Props) {
         </span>
       </div>
       {isComponentVisible && (
-        <div className="absolute right-0 p-2 w-[200px] rounded-lg bg-secondary shadow-md shadow-slate-900">
+        <div className="absolute right-0 p-2 w-[200px] rounded-lg bg-hover shadow-md shadow-slate-900">
           <div>
             {profile_menu.map((profile) => (
               <Link key={profile.href} to={profile.href}>
-                <div className="my-2 cursor-pointer hover:bg-gray-900 p-2 rounded-md flex items-center justify-start">
+                <div className="my-2 cursor-pointer hover:bg-secondary p-2 rounded-md flex items-center justify-start">
                   <img src={profile.icon} alt="profile" />
                   <span className="text-sm ml-3">{profile.title}</span>
                 </div>
               </Link>
             ))}
             <button
-              className="my-2 w-full p-2 cursor-pointer hover:bg-gray-900 rounded-md"
+              className="my-2 w-full p-2 cursor-pointer hover:bg-secondary rounded-md"
               onClick={logout}
             >
               <span className="text-red-400 text-center text-sm ">Logout</span>

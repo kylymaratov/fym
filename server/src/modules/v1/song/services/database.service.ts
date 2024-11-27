@@ -180,6 +180,14 @@ export class SongDatabaseService {
     return songs.map((song) => ({ ...song, likes: Number(song.likes) || 0 }));
   }
 
+  async checkLikedSong(user: UserEntity, song_id: string) {
+    const like = await this.songLikeRepository.findOne({
+      where: { user: { id: user.id }, song: { song_id } },
+    });
+
+    return !!like;
+  }
+
   private async cleanOldCachedSongs() {
     try {
       const totalCacheSize = await this.songCacheRepository

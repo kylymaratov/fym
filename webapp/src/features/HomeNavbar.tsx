@@ -14,21 +14,21 @@ function HomeNavbar() {
   const userState = useContext(UserContext);
 
   return (
-    <div className="px-2 lg:px-[21px] py-[19px] h-[450px] relative overflow-hidden">
-      <div className="absolute w-[35%] bg-[#0f0f0f] h-[120%] z-20 -top-10 left-20 opacity-100 blur-lg"></div>
+    <div className="px-2 py-4 lg:px-4 lg:py-6 h-[450px] relative overflow-hidden">
+      <div className="absolute w-[37%] bg-secondary h-[120%] z-20 -top-10 left-20 opacity-100 blur-lg"></div>
       {state.playNow ? (
         <img
           src={`https://i.ytimg.com/vi/${state.playNow.song_id}/mqdefault.jpg`}
           loading="lazy"
           alt="bg"
-          className="absolute select-none pointer-events-none z-10 top-0 right-0 w-[70%] opacity-30 object-cover h-[110%] rounded-lg"
+          className="absolute select-none pointer-events-none z-10 top-0 right-0 w-[70%] opacity-50 object-cover h-[110%]"
         />
       ) : (
         <img
           src={BannerImg}
           loading="lazy"
           alt="banner"
-          className="absolute select-none pointer-events-none z-10 top-0 right-0 w-[70%] opacity-30 object-cover h-[110%] rounded-lg"
+          className="absolute select-none pointer-events-none z-10 top-0 right-0 w-[70%] opacity-50 object-cover h-[110%]"
         />
       )}
       <div className="z-30 relative h-full">
@@ -68,12 +68,14 @@ function HomeNavbar() {
             !
           </h1>
           <p className="text-md mt-4 text-gray-200">
-            Dive into a world of endless melodies, trending hits, and timeless
-            classics. Stream without limits, create playlists, and feel the
-            rhythm wherever you are.
+            Discover a world of limitless music! Like, share, create playlists,
+            and enjoy your favorite tracks anytime, anywhere. Music is the
+            rhythm of your life, and we are your ultimate music platform! Here,
+            everyone can find their melody to get inspired, dream, and keep
+            moving forward.
           </p>
 
-          <div className="absolute bottom-0 flex justify-between items-center w-full lg:w-[35%]">
+          <div className="absolute bottom-0 flex justify-between items-center w-full lg:w-[37%]">
             <button
               type="button"
               className=" uppercase text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"

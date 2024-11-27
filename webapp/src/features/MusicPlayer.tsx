@@ -18,11 +18,12 @@ import { PlayerContext } from '@/context/PlayerContext';
 import { SongTypes } from '@/types/song.types';
 import { baseUrl } from '@/api/base.url';
 import LoadingText from '@/components/LoadingText';
+import UseVisible from '@/hooks/UseVisible';
 
 function MusicPlayer() {
   const [showVolume, setShowVolume] = useState<boolean>(false);
   const [expandRange, setExpandRange] = useState<boolean>(false);
-
+  const queueComp = UseVisible(false);
   const {
     state: {
       musicPlayer,
@@ -33,6 +34,7 @@ function MusicPlayer() {
       quality,
       repeat,
       shuffle,
+      playNext,
     },
     setPlayerState,
   } = useContext(PlayerContext);
@@ -91,7 +93,28 @@ function MusicPlayer() {
 
   const handleEnded = () => {
     if (repeat) {
-      musicPlayer.play();
+      return musicPlayer.play();
+    }
+
+    nextSong();
+  };
+
+  const nextSong = () => {
+    const currentSong = playNext.findIndex(
+      (item) => item.song_id === playNow?.song_id,
+    );
+
+    if (typeof currentSong !== 'undefined' && playNext[currentSong + 1]) {
+      setPlayerState('playNow', playNext[currentSong + 1]);
+    }
+  };
+
+  const prevSong = () => {
+    const currentSong = playNext.findIndex(
+      (item) => item.song_id === playNow?.song_id,
+    );
+    if (typeof currentSong !== 'undefined' && playNext[currentSong - 1]) {
+      setPlayerState('playNow', playNext[currentSong - 1]);
     }
   };
 
@@ -112,7 +135,7 @@ function MusicPlayer() {
     musicPlayer.onloadedmetadata = () => {
       setPlayerState('loading', false);
     };
-  }, [musicPlayer]);
+  }, [musicPlayer, playNow]);
 
   useEffect(() => {
     if (playNow) {
@@ -132,7 +155,7 @@ function MusicPlayer() {
 
   return (
     <div
-      className="w-full bg-secondary"
+      className="w-full bg-black"
       onMouseEnter={() => setExpandRange(true)}
       onMouseLeave={() => setExpandRange(false)}
     >
@@ -198,7 +221,7 @@ function MusicPlayer() {
           >
             <MdShuffle size={22} />
           </button>
-          <button type="button" disabled={!playNow}>
+          <button type="button" disabled={!playNow} onClick={prevSong}>
             <MdOutlineSkipPrevious size={22} />
           </button>
           <button type="button" onClick={setPlayOrPause} disabled={!playNow}>
@@ -208,7 +231,7 @@ function MusicPlayer() {
               <FaPauseCircle size={28} />
             )}
           </button>
-          <button type="button" disabled={!playNow}>
+          <button type="button" disabled={!playNow} onClick={nextSong}>
             <MdOutlineSkipNext size={22} />
           </button>
           <button
@@ -220,7 +243,13 @@ function MusicPlayer() {
         </div>
 
         <div className="items-center justify-end gap-4 w-[30%] md:flex hidden">
-          <button type="button" className="text-white">
+          <button
+            type="button"
+            className="text-white"
+            onClick={() =>
+              queueComp.setIsComponentVisible(!queueComp.isComponentVisible)
+            }
+          >
             <MdOutlineQueueMusic size={22} />
           </button>
           <button type="button" className="text-white">
@@ -260,6 +289,43 @@ function MusicPlayer() {
             </div>
           </div>
         </div>
+        {playNext.length && queueComp.isComponentVisible ? (
+          <div
+            ref={queueComp.ref}
+            id="queue"
+            className="fixed right-8 bottom-20 bg-secondary p-4 w-[400px] z-50 rounded-lg shadow-sm shadow-secondary"
+          >
+            <p className="text-md font-bold">Play next</p>
+            {playNext.map((song) => (
+              <div
+                key={song.song_id}
+                className="my-2 flex justify-between items-center"
+              >
+                <div className="flex justify-start items-center">
+                  <img
+                    src={`https://i.ytimg.com/vi/${song.song_id}/mqdefault.jpg`}
+                    loading="lazy"
+                    alt="cover"
+                    className="w-[50px] h-[50px] object-cover"
+                  />
+                  <div className="ml-3 md:ml-5">
+                    {song.title ? (
+                      <>
+                        <p className="text-sm">{song.title.slice(0, 30)}</p>
+                        <p className="text-sm text-gray-400">
+                          {song.artist?.slice(0, 30) ||
+                            song.author?.slice(0, 30)}
+                        </p>
+                      </>
+                    ) : (
+                      <p>{song.original_title.slice(0, 30)}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : null}
       </div>
       {playNow && (
         <div className="md:hidden block">

@@ -12,6 +12,7 @@ export interface SongTypes {
   listened_count: number;
   created: string;
   updated: string;
+  liked?: boolean;
 }
 
 export interface ShowSongResponse {

@@ -14,6 +14,7 @@ import { SongDownloadService } from './services/download.service';
 import { UserEntity } from 'src/database/entities/user/user.entity';
 import { GetSongDto } from './dto/getsong.dto';
 import { Request } from 'express';
+import { CheckLikedSongDto } from './dto/check.liked.dto';
 
 @Injectable()
 export class SongService {
@@ -159,5 +160,14 @@ export class SongService {
     const songs = await this.songDatabaseService.findRandomSongs(limit);
 
     return { title: 'Random songs', songs };
+  }
+
+  async checkLikedSong(user: UserEntity, body: CheckLikedSongDto) {
+    const result = await this.songDatabaseService.checkLikedSong(
+      user,
+      body.song_id,
+    );
+
+    return { result };
   }
 }

@@ -51,7 +51,7 @@ function SearchField() {
   const isSearchPage = location.pathname === '/search';
 
   return (
-    <div className="flex gap-4 h-full px-4 items-center justify-start rounded-xl border-gray-700 bg-secondary">
+    <div className="flex gap-4 h-full px-4 items-center justify-start rounded-xl border-gray-700 bg-black">
       <img src={SearchIcon} alt="search" />
       <input
         type="text"

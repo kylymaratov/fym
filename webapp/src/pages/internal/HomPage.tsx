@@ -13,11 +13,11 @@ export const HomePage = () => {
   const playerState = useContext(PlayerContext);
   const topSongsByLikes = UseGetData<ShowSongResponse>(
     'topSongsByLikes',
-    '/song/top-by-likes?limit=5',
+    '/song/top-by-likes?limit=20',
   );
   const topSongsByAuditions = UseGetData<ShowSongResponse>(
     'topSongsByAuditions',
-    '/song/more-auditions?limit=5',
+    '/song/more-auditions?limit=20',
   );
   const recentlyPlaysSongs = UseGetData<ShowSongResponse>(
     'recentlyPlaysSongs',
@@ -34,41 +34,48 @@ export const HomePage = () => {
     true,
   );
 
+  const sections = [
+    {
+      href: '/recently',
+      data: recentlyPlaysSongs,
+    },
+    {
+      href: '/recomendations',
+      data: recomendationSongs,
+    },
+    {
+      href: '/top-by-likes',
+      data: topSongsByLikes,
+    },
+    {
+      href: '/top-auditions',
+      data: topSongsByAuditions,
+    },
+    {
+      href: '/liked',
+      data: userLikedSongs,
+      roundedFull: true,
+    },
+  ];
+
   return (
     <div>
       <HomeNavbar />
       <div>
-        {recentlyPlaysSongs.data && (
-          <div className="my-5">
-            <ShowCase data={recentlyPlaysSongs.data} toMore="/recently" />
-          </div>
-        )}
-        {recomendationSongs.data && (
-          <div className="my-14">
-            <ShowCase data={recomendationSongs.data} toMore="/recomendations" />
-          </div>
-        )}
         <div className="relative">
-          {topSongsByLikes.loading ? (
-            <Centered>
-              <LoadingSpinner />
-            </Centered>
-          ) : (
-            [topSongsByLikes, topSongsByAuditions].map(
-              (item, key) =>
-                item.data && (
-                  <div key={key} className="my-10">
-                    <ShowTable data={item.data} numeric />
-                  </div>
-                ),
-            )
+          {sections.map(
+            (item, key) =>
+              item.data.data && (
+                <div key={key} className="my-8">
+                  <ShowCase
+                    data={item.data.data}
+                    roundedFull={item.roundedFull}
+                    toMore={item.href}
+                  />
+                </div>
+              ),
           )}
         </div>
-        {userLikedSongs.data && (
-          <div className="my-5">
-            <ShowCase data={userLikedSongs.data} toMore="/liked" />
-          </div>
-        )}
       </div>
       <Footer />
     </div>

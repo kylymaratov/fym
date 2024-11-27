@@ -7,6 +7,7 @@ import LoginPage from '@/pages/LoginPage';
 import SignupPage from '@/pages/SignupPage';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { LikedPage } from '@/pages/internal/LikedPage';
+import { SongPage } from '@/pages/internal/SongPage';
 
 export const UseRoutes = () => {
   const { user } = UseGetMe();
@@ -25,6 +26,7 @@ export const UseRoutes = () => {
         <Route path="search" element={<SearchPage />} />
         <Route path="recently" element={<RecentPage />} />
         <Route path="liked" element={<LikedPage />} />
+        <Route path="song/:songId" element={<SongPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>

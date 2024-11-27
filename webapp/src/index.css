@@ -9,7 +9,7 @@ body {
   margin: 0;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
-  background: #0f0f0f;
+  background: black;
 }
 
 html {
@@ -17,7 +17,7 @@ html {
 }
 
 html.dark {
-  background: #0f0f0f;
+  background: black;
   color: white;
 }
 

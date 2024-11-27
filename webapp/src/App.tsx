@@ -1,6 +1,7 @@
 import { Flip, ToastContainer } from 'react-toastify';
 import { UseRoutes } from './hooks/UseRoutes';
 import { useEffect } from 'react';
+
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
@@ -10,8 +11,12 @@ function App() {
     document.documentElement.classList.add('dark');
   }, []);
 
+  const handleContextMenu = (event: React.MouseEvent) => {
+    event.preventDefault();
+  };
+
   return (
-    <div>
+    <div onContextMenu={handleContextMenu}>
       {routes}
       <ToastContainer
         position="bottom-right"

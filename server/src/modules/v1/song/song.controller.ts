@@ -22,6 +22,7 @@ import { UserEntity } from 'src/database/entities/user/user.entity';
 import { LikeSongDto } from './dto/like.dto';
 import { GetSongDto } from './dto/getsong.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt.auth.guard';
+import { CheckLikedSongDto } from './dto/check.liked.dto';
 
 @ApiTags('song')
 @Controller(`/api/${serverEnv.sv}/song`)
@@ -54,6 +55,14 @@ export class SongController {
       req.session.recently_plays || [],
       query.limit,
     );
+  }
+
+  @Post('check-liked')
+  checkLikedSong(
+    @CurrentUser() user: UserEntity,
+    @Body() body: CheckLikedSongDto,
+  ) {
+    return this.songService.checkLikedSong(user, body);
   }
 
   @Get('listen')

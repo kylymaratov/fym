@@ -11,6 +11,7 @@ interface PlayerContextState {
     loading: boolean;
     lastVolume: number;
     musicPlayer: HTMLAudioElement;
+    playNext: SongTypes[];
   };
   setPlayerState: <K extends keyof typeof defaultValue.state>(
     action: K,
@@ -28,6 +29,7 @@ const defaultValue: PlayerContextState = {
     loading: false,
     lastVolume: 0,
     musicPlayer: new Audio(),
+    playNext: [],
   },
   setPlayerState: () => {},
 };
