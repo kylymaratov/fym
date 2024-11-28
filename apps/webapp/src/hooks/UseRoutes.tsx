@@ -1,4 +1,3 @@
-import { UseGetMe } from '@/api/requests';
 import { RecentPage } from '@/pages/internal/RecentPage';
 import { Container } from '@/pages/internal/Container';
 import { HomePage } from '@/pages/internal/HomPage';
@@ -8,9 +7,21 @@ import SignupPage from '@/pages/SignupPage';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { LikedPage } from '@/pages/internal/LikedPage';
 import { SongPage } from '@/pages/internal/SongPage';
+import { useGetUserQuery } from '@/api/user.api';
+import { useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { userActions } from '@/store/slices/user.slice';
 
 export const UseRoutes = () => {
-  const { user } = UseGetMe();
+  const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.user);
+  const { data } = useGetUserQuery(`?userId=${user?.id}`);
+
+  useEffect(() => {
+    if (data) {
+      dispatch(userActions.setUser(data));
+    }
+  }, [data]);
 
   return (
     <Routes>

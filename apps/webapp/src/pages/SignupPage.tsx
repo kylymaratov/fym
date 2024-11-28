@@ -3,11 +3,11 @@ import { Formik, Field, Form } from 'formik';
 import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { Centered } from '@/components/Centered';
-import { UseApi } from '@/api/api';
 import { useState } from 'react';
 import { FaEyeSlash, FaEye } from 'react-icons/fa';
+import { useUserSignupMutation } from '@/api/user.api';
 
-interface InitialValues {
+export interface SignupInitialValues {
   email: string;
   name: string;
   password: string;
@@ -15,9 +15,8 @@ interface InitialValues {
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
-
-  const { request } = UseApi();
   const navigate = useNavigate();
+  const [createUserRequest] = useUserSignupMutation();
 
   const validationSchema = Yup.object({
     name: Yup.string().required('Name is required'),
@@ -27,24 +26,20 @@ export default function SignupPage() {
     email: Yup.string().email('Invalid email').required('Email is required'),
   });
 
-  const initialValues: InitialValues = {
+  const initialValues: SignupInitialValues = {
     email: '',
     password: '',
     name: '',
   };
 
-  const createUser = async (values: InitialValues, fn: any) => {
+  const createUser = async (values: SignupInitialValues, fn: any) => {
     try {
-      const response = await request(
-        '/auth/register',
-        'POST',
-        JSON.stringify(values),
-      );
+      const response = await createUserRequest(values).unwrap();
 
-      toast(response.data?.message, { type: 'success' });
+      toast(response.message, { type: 'success' });
       navigate('/login');
     } catch (error) {
-    } finally {
+      toast((error as Error).message, { type: 'error' });
       fn.resetForm();
     }
   };

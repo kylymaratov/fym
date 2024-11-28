@@ -1,19 +1,17 @@
 import SearchBanner from '@/assets/images/search-banner.png';
-import { useContext } from 'react';
 import ShowTable from '@/components/ShowTable';
-import { SearchContext } from '@/context/SearchContext';
+import { useAppSelector } from '@/store/hooks';
 
 function SearchResult() {
-  const { state } = useContext(SearchContext);
+  const { searchResult } = useAppSelector((state) => state.search);
   return (
     <div>
-      {state.searchResult.length ? (
+      {searchResult.length ? (
         <div>
           <ShowTable
             data={{
               title: 'Search result',
-              songs: state.searchResult,
-              url: '',
+              songs: searchResult,
             }}
           />
         </div>

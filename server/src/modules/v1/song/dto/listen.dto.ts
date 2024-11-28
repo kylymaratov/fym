@@ -4,7 +4,7 @@ import { REXEGP } from 'src/constants/regexp';
 export class ListenSongDto {
   @IsNotEmpty()
   @Matches(REXEGP.SONG_ID)
-  songId: string;
+  song_id: string;
 
   quality: number = 1;
 }

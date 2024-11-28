@@ -1,43 +1,34 @@
-'use client';
-
 import SearchIcon from '@/assets/icons/search.svg';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import CloseIcon from '@/assets/icons/close.svg';
 import { useLocation } from 'react-router-dom';
 import LoadingText from './LoadingText';
-import { SongTypes } from '@/types/song.types';
-import { UseApi } from '@/api/api';
-import { SearchContext } from '@/context/SearchContext';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { searchActions } from '@/store/slices/search.slice';
+import { useSearchSongsMutation } from '@/api/search.api';
+import { toast } from 'react-toastify';
 
 function SearchField() {
   const location = useLocation();
-  const { request } = UseApi();
-
-  const { setSearchState, state } = useContext(SearchContext);
-  const [loading, setLoading] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
+  const { searchQuery } = useAppSelector((state) => state.search);
+  const [searchSongs, { isLoading }] = useSearchSongsMutation();
 
   const doSearch = async () => {
-    if (!state.searchQuery.length) {
-      return setSearchState('searchResult', []);
+    if (!searchQuery.length) {
+      return dispatch(searchActions.setSearchResult([]));
     }
     try {
-      setLoading(true);
-      const response = await request<SongTypes>(
-        '/song/search',
-        'POST',
-        JSON.stringify({ query: state.searchQuery }),
-      );
-      setSearchState('searchResult', response.data);
+      const response = await searchSongs({ query: searchQuery }).unwrap();
+      dispatch(searchActions.setSearchResult(response));
     } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
+      toast((error as Error).message);
     }
   };
 
   const resetSearch = () => {
-    setSearchState('searchResult', []);
-    setSearchState('searchQuery', '');
+    dispatch(searchActions.setSearchResult([]));
+    dispatch(searchActions.setSearchQuery(''));
   };
 
   useEffect(() => {
@@ -46,23 +37,28 @@ function SearchField() {
     }, 1000);
 
     return () => clearTimeout(timeout);
-  }, [state.searchQuery]);
+  }, [searchQuery]);
 
-  const isSearchPage = location.pathname === '/search';
+  const isSearchPage = useMemo(
+    () => location.pathname === '/search',
+    [location.pathname],
+  );
 
   return (
-    <div className="flex gap-4 h-full px-4 items-center justify-start rounded-xl border-gray-700 bg-black">
+    <div className="flex gap-4 h-full px-4 items-center justify-start rounded-xl border-gray-700 bg-[#1f1f1f]">
       <img src={SearchIcon} alt="search" />
       <input
         type="text"
         placeholder="Search by name, keyword, or artist"
         className="w-full outline-none border-none bg-transparent text-sm"
         autoFocus={isSearchPage}
-        onChange={(event) => setSearchState('searchQuery', event.target.value)}
-        value={state.searchQuery}
+        onChange={(event) =>
+          dispatch(searchActions.setSearchQuery(event.target.value))
+        }
+        value={searchQuery}
       />
-      {loading && <LoadingText />}
-      {isSearchPage && state.searchQuery && (
+      {isLoading && <LoadingText />}
+      {isSearchPage && searchQuery && (
         <button type="button" onClick={resetSearch}>
           <img src={CloseIcon} alt="close" />
         </button>

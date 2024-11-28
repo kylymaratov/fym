@@ -35,7 +35,7 @@ export class AuthService {
     return await this.userDatabaseService.findUserById(userId);
   }
 
-  loginUser(req: Request, user: UserEntity) {
+  async loginUser(req: Request, user: UserEntity) {
     const payload = { username: user.email, sub: user.id };
     const expiresIn = '10d';
     const expiresInMilliseconds = 10 * 24 * 60 * 60 * 1000;
@@ -46,7 +46,6 @@ export class AuthService {
     req.session.user_ip = (req.headers['x-forwarded-for'] as string) || req.ip;
 
     return {
-      message: 'Successfilly logged',
       access_token,
       expiresInMilliseconds,
     };

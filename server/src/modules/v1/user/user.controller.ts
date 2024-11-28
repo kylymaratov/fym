@@ -20,17 +20,4 @@ export class UserController {
   getUserSessions(@CurrentUser() user: UserEntity) {
     return this.userService.getUserSessions(user);
   }
-
-  @Get('/song/liked')
-  getLikedSongs(
-    @CurrentUser() user: UserEntity,
-    @Query() query: { limit: number },
-  ) {
-    return this.userService.getLikedSongs(user, query.limit);
-  }
-
-  @Get('/song/recomend')
-  getRecomendSongs(@CurrentUser() user: UserEntity) {
-    return this.userService.getRecomendSongs(user);
-  }
 }

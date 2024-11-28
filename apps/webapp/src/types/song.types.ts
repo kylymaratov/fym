@@ -15,8 +15,7 @@ export interface SongTypes {
   liked?: boolean;
 }
 
-export interface ShowSongResponse {
+export interface ViewCaseTypes {
   title: string;
   songs: SongTypes[];
-  url: string;
 }

@@ -1,15 +1,15 @@
 import * as Yup from 'yup';
 import { Formik, Field, Form } from 'formik';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { UseApi } from '@/api/api';
 import { Link, useNavigate } from 'react-router-dom';
 import { Centered } from '@/components/Centered';
 import { FaEyeSlash, FaEye } from 'react-icons/fa';
-import { UserContext } from '@/context/UserContext';
-import { UserTypes } from '@/types/user.types';
+import { useAppDispatch } from '@/store/hooks';
+import { userActions } from '@/store/slices/user.slice';
+import { useUserLoginMutation } from '@/api/user.api';
 
-interface InitialValues {
+export interface LoginInitialValues {
   email: string;
   password: string;
 }
@@ -17,9 +17,9 @@ interface InitialValues {
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(true);
-  const { request } = UseApi();
   const navigate = useNavigate();
-  const { setUserState } = useContext(UserContext);
+  const dispatch = useAppDispatch();
+  const [loginUserRequest] = useUserLoginMutation();
 
   const validationSchema = Yup.object({
     password: Yup.string()
@@ -28,27 +28,21 @@ export default function LoginPage() {
     email: Yup.string().email('Invalid email').required('Email is required'),
   });
 
-  const initialValues: InitialValues = {
+  const initialValues: LoginInitialValues = {
     email: '',
     password: '',
   };
 
-  const loginUser = async (values: InitialValues, fn: any) => {
+  const loginUser = async (values: LoginInitialValues, fn: any) => {
     try {
-      const response = await request(
-        '/auth/login',
-        'POST',
-        JSON.stringify({ ...values, rememberMe }),
-      );
+      const response = await loginUserRequest(values).unwrap();
 
-      const { data } = await request<UserTypes>('/user/me');
+      dispatch(userActions.setUser(response));
 
-      setUserState('user', data);
-
-      toast(response.data?.message, { type: 'success' });
+      toast('Login successfilly', { type: 'success' });
       navigate('/');
     } catch (error) {
-    } finally {
+      toast((error as Error).message, { type: 'error' });
       fn.resetForm();
     }
   };

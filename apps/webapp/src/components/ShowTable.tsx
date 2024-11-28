@@ -1,16 +1,15 @@
-import { useContext,   } from 'react';
 import PlayIcon from '@/assets/icons/play.svg';
 import OptionIcon from '@/assets/icons/option.svg';
 import PauseIcon from '@/assets/icons/pause.svg';
-import { PlayerContext } from '@/context/PlayerContext';
-import { ShowSongResponse, SongTypes } from '@/types/song.types';
+import { ViewCaseTypes, SongTypes } from '@/types/song.types';
 import UseVisible from '@/hooks/UseVisible';
 
-import 'swiper/swiper-bundle.css'
- 
- 
+import 'swiper/swiper-bundle.css';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { playerActions } from '@/store/slices/player.slice';
+
 interface Props {
-  data: ShowSongResponse;
+  data: ViewCaseTypes;
   withButton?: boolean;
   numeric?: boolean;
 }
@@ -49,10 +48,8 @@ interface SongItemProps {
 
 export const SongItem: React.FC<SongItemProps> = ({ song, numeric }) => {
   const showOptions = UseVisible(false);
-  const {
-    setPlayerState,
-    state: { playNow, playing },
-  } = useContext(PlayerContext);
+  const { playNow, playing } = useAppSelector((state) => state.player);
+  const dispatch = useAppDispatch();
 
   function formatTime(seconds: number): string {
     const minutes = Math.floor(seconds / 60);
@@ -64,7 +61,7 @@ export const SongItem: React.FC<SongItemProps> = ({ song, numeric }) => {
   function playSong(song: SongTypes) {
     if (playNow?.song_id === song.song_id) {
     } else {
-      setPlayerState('playNow', song);
+      dispatch(playerActions.setPlayNow(song));
     }
   }
   return (

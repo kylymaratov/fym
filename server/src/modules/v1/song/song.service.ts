@@ -14,7 +14,6 @@ import { SongDownloadService } from './services/download.service';
 import { UserEntity } from 'src/database/entities/user/user.entity';
 import { GetSongDto } from './dto/getsong.dto';
 import { Request } from 'express';
-import { CheckLikedSongDto } from './dto/check.liked.dto';
 
 @Injectable()
 export class SongService {
@@ -32,19 +31,19 @@ export class SongService {
   }
 
   async listen(query: ListenSongDto) {
-    const { songId, quality } = query;
+    const { song_id, quality } = query;
 
-    const song = await this.songDatabaseService.findBySongId(songId, [
+    const song = await this.songDatabaseService.findBySongId(song_id, [
       'cache',
       'metadata',
     ]);
 
     if (!song) {
-      const saved_song = await this.songSearchService.findOneSong(songId);
+      const saved_song = await this.songSearchService.findOneSong(song_id);
       if (!saved_song) {
         throw new BadRequestException(
           "I can't download this song. Maybe it's not a song, songId: " +
-            songId,
+            song_id,
         );
       }
       const { buffer, metadata } = await this.songDownloadService.downloadSong(
@@ -100,13 +99,13 @@ export class SongService {
   async getTopSongsByLike(limit: number = 10) {
     const result = await this.songDatabaseService.findTopSongsByLike(limit);
 
-    return { title: `Top ${limit} songs by likes`, songs: result };
+    return { title: `Top songs by likes`, songs: result };
   }
 
   async getMoreAuidionsSongs(limit: number = 10) {
     const result = await this.songDatabaseService.findMoreAuidionsSongs(limit);
 
-    return { title: `Top ${limit} listened songs`, songs: result };
+    return { title: `Top songs by listening`, songs: result };
   }
 
   addRecentlyPlays(req: Request, song_id: string) {
@@ -162,12 +161,33 @@ export class SongService {
     return { title: 'Random songs', songs };
   }
 
-  async checkLikedSong(user: UserEntity, body: CheckLikedSongDto) {
-    const result = await this.songDatabaseService.checkLikedSong(
+  async checkLikedSong(user: UserEntity, song_id) {
+    const result = await this.songDatabaseService.checkLikedSong(user, song_id);
+
+    return result;
+  }
+
+  async getLikedSongs(user: UserEntity, limit: number = 20) {
+    const songs = await this.songDatabaseService.findUserLikedSongs(
       user,
-      body.song_id,
+      limit,
     );
 
-    return { result };
+    return { title: 'Your liked songs', songs };
+  }
+
+  async getRecomendSongs(user: UserEntity) {
+    const likedSongs = (await this.getLikedSongs(user)).songs;
+
+    const response = { title: 'Best songs for you', songs: [] };
+
+    if (!likedSongs.length) return response;
+
+    const randomSong =
+      likedSongs[Math.floor(Math.random() * likedSongs.length)];
+
+    response.songs = await this.songSearchService.getRelatedSongs(randomSong);
+
+    return response;
   }
 }

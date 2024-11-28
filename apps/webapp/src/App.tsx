@@ -17,7 +17,7 @@ function App() {
 
   return (
     <div onContextMenu={handleContextMenu} className="select-none">
-      {routes}
+      <div>{routes}</div>
       <ToastContainer
         position="bottom-right"
         closeOnClick

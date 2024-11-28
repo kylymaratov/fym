@@ -1,21 +1,20 @@
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 import ProfileIcon from '@/assets/icons/profile.svg';
 import SettingsIcon from '@/assets/icons/settings.svg';
 import UseVisible from '@/hooks/UseVisible';
-import { UserTypes } from '@/types/user.types';
 import { Link } from 'react-router-dom';
-import { UseApi } from '@/api/api';
-import { PlayerContext } from '@/context/PlayerContext';
 
-interface Props {
-  user: UserTypes;
-  setUserState: (action: any, value: any) => void;
-}
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { useLazyUserLogoutQuery } from '@/api/user.api';
+import { userActions } from '@/store/slices/user.slice';
+import { playerActions } from '@/store/slices/player.slice';
 
-function ProfileBadge({ user, setUserState }: Props) {
+function ProfileBadge() {
   const { ref, isComponentVisible, setIsComponentVisible } = UseVisible(false);
-  const { request } = UseApi();
-  const { setPlayerState } = useContext(PlayerContext);
+  const { user } = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
+  const [userLogout] = useLazyUserLogoutQuery();
+
   const profile_menu = useMemo(
     () => [
       {
@@ -34,11 +33,13 @@ function ProfileBadge({ user, setUserState }: Props) {
 
   const logout = async () => {
     try {
-      await request('/auth/logout');
-      setUserState('user', null);
-      setPlayerState('playNow', null);
+      await userLogout('').unwrap();
+      dispatch(userActions.setUser(null));
+      dispatch(playerActions.setPlayNow(null));
       window.location.reload();
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -48,9 +49,7 @@ function ProfileBadge({ user, setUserState }: Props) {
         onClick={() => setIsComponentVisible(!isComponentVisible)}
       >
         <span className="uppercase text-fond text-lg">
-          {user.user_info?.name
-            ? user.user_info.name.slice(0, 1)
-            : 'User'.slice(0, 1)}
+          {user ? user.user_info?.name.slice(0, 1) : 'User'.slice(0, 1)}
         </span>
       </div>
       {isComponentVisible && (

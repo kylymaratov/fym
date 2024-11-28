@@ -6,11 +6,7 @@ import { SongSearchService } from '../song/services/search.service';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @Inject() private userDatabaseService: UserDatabaseService,
-    @Inject() private songDatabaseService: SongDatabaseService,
-    @Inject() private songSearchService: SongSearchService,
-  ) {}
+  constructor(@Inject() private userDatabaseService: UserDatabaseService) {}
 
   async getMe(user: UserEntity) {
     const { user_info } = await this.userDatabaseService.findUserWithRel(user, [
@@ -26,29 +22,5 @@ export class UserService {
     );
 
     return { user, sessions };
-  }
-
-  async getLikedSongs(user: UserEntity, limit: number = 20) {
-    const songs = await this.songDatabaseService.findUserLikedSongs(
-      user,
-      limit,
-    );
-
-    return { title: 'Your liked songs', songs };
-  }
-
-  async getRecomendSongs(user: UserEntity) {
-    const likedSongs = (await this.getLikedSongs(user)).songs;
-
-    const response = { title: 'Best songs for you', songs: [] };
-
-    if (!likedSongs.length) return response;
-
-    const randomSong =
-      likedSongs[Math.floor(Math.random() * likedSongs.length)];
-
-    response.songs = await this.songSearchService.getRelatedSongs(randomSong);
-
-    return response;
   }
 }

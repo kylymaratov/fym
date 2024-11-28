@@ -11,14 +11,15 @@ import {
   MdOutlineQueueMusic,
 } from 'react-icons/md';
 import { LiaDownloadSolid } from 'react-icons/lia';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import RangeLine from '@/components/RangeLine';
 import { toast } from 'react-toastify';
-import { PlayerContext } from '@/context/PlayerContext';
 import { SongTypes } from '@/types/song.types';
-import { baseUrl } from '@/api/base.url';
 import LoadingText from '@/components/LoadingText';
 import UseVisible from '@/hooks/UseVisible';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { playerActions } from '@/store/slices/player.slice';
+import { baseUrl } from '@/api/base.url';
 
 function MusicPlayer() {
   const [expandRange, setExpandRange] = useState<boolean>(false);
@@ -33,12 +34,12 @@ function MusicPlayer() {
     lastVolume: 0,
   });
   const musicPlayer = useRef<HTMLAudioElement>(new Audio());
+  const dispatch = useAppDispatch();
 
   const queueComp = UseVisible(false);
-  const {
-    state: { playNow, playNext, playingTrigger },
-    setPlayerState,
-  } = useContext(PlayerContext);
+  const { playNow, playingTrigger, queue } = useAppSelector(
+    (state) => state.player,
+  );
 
   const setVolumeOnClick = (incomingVolume: number): void => {
     musicPlayer.current.volume = incomingVolume / 100;
@@ -52,17 +53,17 @@ function MusicPlayer() {
     if (playNow) {
       if (musicPlayer.current.paused) {
         musicPlayer.current.play();
-        setPlayerState('playing', true);
+        dispatch(playerActions.setPlaying(true));
       } else {
         musicPlayer.current.pause();
-        setPlayerState('playing', false);
+        dispatch(playerActions.setPlaying(false));
       }
     }
   };
 
   const startPlayer = (song: SongTypes): void => {
     try {
-      const audioSource = baseUrl + `/song/listen?songId=${song.song_id}`;
+      const audioSource = baseUrl + `/song/listen?song_id=${song.song_id}`;
 
       setMusicState((prev) => ({ ...prev, loadingProgress: 0, loading: true }));
 
@@ -112,21 +113,21 @@ function MusicPlayer() {
   };
 
   const nextSong = () => {
-    const currentSong = playNext.findIndex(
+    const currentSong = queue.findIndex(
       (item) => item.song_id === playNow?.song_id,
     );
 
-    if (typeof currentSong !== 'undefined' && playNext[currentSong + 1]) {
-      setPlayerState('playNow', playNext[currentSong + 1]);
+    if (typeof currentSong !== 'undefined' && queue[currentSong + 1]) {
+      dispatch(playerActions.setPlayNow(queue[currentSong + 1]));
     }
   };
 
   const prevSong = () => {
-    const currentSong = playNext.findIndex(
+    const currentSong = queue.findIndex(
       (item) => item.song_id === playNow?.song_id,
     );
-    if (typeof currentSong !== 'undefined' && playNext[currentSong - 1]) {
-      setPlayerState('playNow', playNext[currentSong - 1]);
+    if (typeof currentSong !== 'undefined' && queue[currentSong - 1]) {
+      dispatch(playerActions.setPlayNow(queue[currentSong - 1]));
     }
   };
 
@@ -162,7 +163,7 @@ function MusicPlayer() {
     return () => {
       musicPlayer.current.pause();
       musicPlayer.current.src = '';
-      setPlayerState('playNow', null);
+      dispatch(playerActions.setPlayNow(null));
     };
   }, []);
 
@@ -243,7 +244,7 @@ function MusicPlayer() {
               setMusicState((prev) => ({ ...prev, shuffle: !shuffle }))
             }
           >
-            <MdShuffle size={22} color={shuffle ? 'green' : 'white'} />
+            <MdShuffle size={22} color={shuffle ? 'blue' : 'white'} />
           </button>
           <button type="button" disabled={!playNow} onClick={prevSong}>
             <MdOutlineSkipPrevious size={22} />
@@ -264,7 +265,7 @@ function MusicPlayer() {
               setMusicState((prev) => ({ ...prev, repeat: !repeat }))
             }
           >
-            <MdRepeat size={22} color={repeat ? 'green' : 'white'} />
+            <MdRepeat size={22} color={repeat ? 'blue' : 'white'} />
           </button>
         </div>
 
@@ -305,14 +306,14 @@ function MusicPlayer() {
             </div>
           </div>
         </div>
-        {playNext.length && queueComp.isComponentVisible ? (
+        {queue.length && queueComp.isComponentVisible ? (
           <div
             ref={queueComp.ref}
             id="queue"
             className="fixed right-8 bottom-20 bg-secondary p-4 w-[400px] z-50 rounded-lg shadow-sm shadow-secondary"
           >
             <p className="text-md font-bold">Play next</p>
-            {playNext.map((song) => (
+            {queue.map((song) => (
               <div
                 key={song.song_id}
                 className="my-2 flex justify-between items-center"

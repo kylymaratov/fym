@@ -22,7 +22,6 @@ import { UserEntity } from 'src/database/entities/user/user.entity';
 import { LikeSongDto } from './dto/like.dto';
 import { GetSongDto } from './dto/getsong.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt.auth.guard';
-import { CheckLikedSongDto } from './dto/check.liked.dto';
 
 @ApiTags('song')
 @Controller(`/api/${serverEnv.sv}/song`)
@@ -30,26 +29,31 @@ export class SongController {
   constructor(private readonly songService: SongService) {}
 
   @Get('/')
+  @HttpCode(200)
   getSongById(@Query() query: GetSongDto) {
     return this.songService.getSongById(query);
   }
 
   @Get('more-auditions')
+  @HttpCode(200)
   getMoreAuidionsSongs(@Query() query: { limit: number }) {
     return this.songService.getMoreAuidionsSongs(query.limit);
   }
 
   @Get('random')
+  @HttpCode(200)
   getRandomSongs(@Query() query: { limit: number }) {
     return this.songService.getRandomSongs(query.limit);
   }
 
   @Get('top-by-likes')
+  @HttpCode(200)
   getTopSongsByLike(@Query() query: { limit: number }) {
     return this.songService.getTopSongsByLike(query.limit);
   }
 
   @Get('recently')
+  @HttpCode(200)
   getRecentlySongs(@Req() req: Request, @Query() query: { limit: number }) {
     return this.songService.getRecentlySongs(
       req.session.recently_plays || [],
@@ -57,12 +61,21 @@ export class SongController {
     );
   }
 
-  @Post('check-liked')
-  checkLikedSong(
+  @Get('liked')
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
+  getLikedSongs(
     @CurrentUser() user: UserEntity,
-    @Body() body: CheckLikedSongDto,
+    @Query() query: { limit: number },
   ) {
-    return this.songService.checkLikedSong(user, body);
+    return this.songService.getLikedSongs(user, query.limit);
+  }
+
+  @Get('recommendations')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  getRecomendSongs(@CurrentUser() user: UserEntity) {
+    return this.songService.getRecomendSongs(user);
   }
 
   @Get('listen')
@@ -96,8 +109,8 @@ export class SongController {
     Readable.from(buffer.slice(start, end + 1)).pipe(res);
 
     if (start === 0) {
-      this.songService.icnListenCount(query.songId);
-      this.songService.addRecentlyPlays(req, query.songId);
+      this.songService.icnListenCount(query.song_id);
+      this.songService.addRecentlyPlays(req, query.song_id);
     }
   }
 
