@@ -4,7 +4,7 @@ import path from 'path';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({mode}) => ({
   plugins: [
     react(),
     VitePWA({
@@ -49,12 +49,12 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  server: {
+  server: mode === 'development' ? {
     proxy: {
       '/api': {
         target: 'http://localhost:5000/api/v1',
         changeOrigin: true,
       },
     },
-  },
-});
+  } : undefined,
+}));
