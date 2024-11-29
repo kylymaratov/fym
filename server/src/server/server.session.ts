@@ -29,6 +29,7 @@ export const setServerSession = (app: INestApplication) => {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         secure: serverEnv.isProd,
+        sameSite: "none"
       },
     }),
   );
