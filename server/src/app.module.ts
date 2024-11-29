@@ -17,7 +17,7 @@ import { PlaylistModule } from './modules/v1/playlist/playlist.module';
     UserModule,
     SongModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
+      rootPath: join(__dirname, '../../apps/webapp/dist/', 'index.html'),
     }),
     PlaylistModule,
   ],
