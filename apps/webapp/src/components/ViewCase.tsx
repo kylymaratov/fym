@@ -34,19 +34,20 @@ function ViewCase({ data, more, rounded = 'rounded-lg' }: Props) {
         dispatch(playerActions.setPlayingTrigger(false));
       }
     } else {
-      playNewSong(song);
+      dispatch(playerActions.setPlayNow(song));
+      setRelatedSongs(song);
     }
   }
 
-  async function playNewSong(song: SongTypes) {
+  async function setRelatedSongs(song: SongTypes) {
     try {
       const data = await getRelated(`?song_id=${song.song_id}`).unwrap();
 
-      dispatch(playerActions.setPlayNow(song));
       const relatedSongs = data ? data.songs.slice(1, data.songs.length) : [];
+
       dispatch(playerActions.setQueue(relatedSongs));
     } catch {
-      dispatch(playerActions.setPlayNow(song));
+      dispatch(playerActions.setQueue([]));
     }
   }
 
