@@ -2,8 +2,7 @@ import PlayIcon from '@/assets/icons/play.svg';
 import OptionIcon from '@/assets/icons/option.svg';
 import PauseIcon from '@/assets/icons/pause.svg';
 import { ViewCaseTypes, SongTypes } from '@/types/song.types';
-import UseVisible from '@/hooks/UseVisible';
-
+ 
 import 'swiper/swiper-bundle.css';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { playerActions } from '@/store/slices/player.slice';
@@ -49,7 +48,6 @@ interface SongItemProps {
 
 export const SongItem: React.FC<SongItemProps> = ({ song, num }) => {
   const [hover, setHover] = useState<boolean>(false);
-  const showOptions = UseVisible(false);
   const { playNow, playing } = useAppSelector((state) => state.player);
   const dispatch = useAppDispatch();
 
