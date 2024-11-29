@@ -61,7 +61,7 @@ export class AuthController {
   }
 
   @ApiBody({ type: [RegisterDto] })
-  @Post('register')
+  @Post('signup')
   @HttpCode(201)
   createUser(@Body() body: RegisterDto) {
     return this.authService.createUser(body);
