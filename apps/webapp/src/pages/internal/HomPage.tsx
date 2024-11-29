@@ -13,9 +13,12 @@ import { useAppSelector } from '@/store/hooks';
 
 export const HomePage = () => {
   const { user } = useAppSelector((state) => state.user);
+  const { playNow } = useAppSelector((state) => state.player);
   const topSongsByLikes = useGetTopSongsByLikesQuery('?limit=15');
   const topSongsByAuditions = useGetTopSongsByListeningQuery('?limit=15');
-  const recentlySongs = useGetRecentlySongsQuery('?limit=10');
+  const recentlySongs = useGetRecentlySongsQuery(
+    `?limit=10&playNow=${playNow?.song_id}`,
+  );
   const recomendationSongs = useGetRecomendationSongsQuery('?limit=15', {
     skip: !user,
   });
