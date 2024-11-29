@@ -203,7 +203,8 @@ export class SongService {
         title: 'Related songs',
         songs: [song, ...related_songs],
       };
-    } catch {
+    } catch (error) {
+      console.log(error);
       return { title: 'Related songs', songs: [] };
     }
   }
