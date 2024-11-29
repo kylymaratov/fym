@@ -53,6 +53,7 @@ export class AuthController {
 
     res.cookie('access_token', access_token, {
       httpOnly: true,
+      sameSite: "none",
       secure: serverEnv.isProd,
       maxAge: expiresInMilliseconds,
     });
