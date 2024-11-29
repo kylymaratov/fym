@@ -7,12 +7,17 @@ import { setServerPassport } from './server/server.passport';
 import { ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './server/server.exception';
 import { setServerDocumentaion } from './server/server.documentation';
+import express from "express"
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {});
 
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter());
+
+  const expressApp = app.getHttpAdapter().getInstance() as express.Application;
+
+  expressApp.set('trust proxy', true);
 
   setServerCors(app);
   setServerSession(app);

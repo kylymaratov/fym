@@ -12,7 +12,7 @@ export const setServerSession = (app: INestApplication) => {
   const PgSession = pgSession(session);
 
   app.use(cookieParser());
-
+  
   app.use(
     session({
       store: new PgSession({
