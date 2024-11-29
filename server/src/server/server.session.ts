@@ -24,6 +24,7 @@ export const setServerSession = (app: INestApplication) => {
       secret: process.env.SERCRET_KEY,
       resave: false,
       saveUninitialized: true,
+      proxy: true,
       cookie: {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
