@@ -6,8 +6,6 @@ import { ConvertUtil } from 'src/utils/convert.util';
 import { KEYWOARDS } from 'src/constants/keywoards';
 import { REXEGP } from 'src/constants/regexp';
 import { SongEntity } from 'src/database/entities/song/song.entity';
-import { getBasicInfo, relatedVideo } from 'ytdl-core';
-import { URLS } from 'src/constants/urls';
 
 @Injectable()
 export class SongSearchService {
@@ -21,108 +19,27 @@ export class SongSearchService {
   ) {}
 
   async getRelatedSongs(song_id: string): Promise<SongEntity[]> {
-    const songs = await getBasicInfo(URLS.WATCH_YT + song_id);
+    const videos = (await this.client.getVideo(song_id))?.related?.items || [];
 
-    return await this.convertYtdlCoreVideo(songs.related_videos);
+    return await this.convertSongs(videos as VideoCompact[], 30);
   }
 
   async findOneSong(songId: string): Promise<SongEntity> {
-    const { videoDetails } = await getBasicInfo(URLS.WATCH_YT + songId);
+    const video = await this.client.getVideo(songId);
 
-    const convertedSong: relatedVideo = {
-      id: videoDetails.videoId,
-      title: videoDetails.title,
-      published: videoDetails.publishDate,
-      author: videoDetails.author,
-      ucid: '',
-      author_thumbnail: '',
-      short_view_count_text: '',
-      view_count: '',
-      length_seconds: Number(videoDetails.lengthSeconds) || 0,
-      video_thumbnail: '',
-      thumbnails: [],
-      richThumbnails: [],
-      isLive: videoDetails.isLiveContent,
-    };
+    if (video.isLiveContent) return;
 
-    const res = await this.convertYtdlCoreVideo([convertedSong]);
+    const songs = await this.convertSongs([video as Video]);
 
-    return res[0];
+    return songs[0];
   }
 
-  async search(query: string, limit: number = 15) {
-    const songs = await this.searchSongs(query, limit);
+  async search(query: string, limit: number) {
+    const videos = await this.client.search(query, { type: 'video' });
+
+    const songs = await this.convertSongs(videos.items, limit);
 
     return songs;
-  }
-
-  private async convertYtdlCoreVideo(
-    videos: relatedVideo[],
-  ): Promise<SongEntity[]> {
-    const songs: SongEntity[] = [];
-
-    for (let video of videos) {
-      if (!this.ytdlCoreSongCheck(video, videos.length === 1)) {
-        continue;
-      }
-
-      const { author, title, artist } = this.getYtdlCoreAuthorAndTitle(video);
-
-      const upload_date = video.published
-        ? this.convertUtil.convertDate(video.published)
-        : null;
-
-      const song: TSong = {
-        song_id: video.id,
-        title: title,
-        artist: artist,
-        author: author,
-        duration: video.length_seconds,
-        is_official: author === artist,
-        original_title: video.title,
-        upload_date,
-      };
-
-      const saved_song = await this.songDatabaseService.saveNewSong(song);
-      songs.push(saved_song);
-    }
-    return songs;
-  }
-
-  private getYtdlCoreAuthorAndTitle(video: relatedVideo) {
-    const author =
-      typeof video.author === 'string'
-        ? video.author
-        : video.author.name || null;
-    const clreared_original_title = REXEGP.CLEAT_TITLE.reduce(
-      (acc, regex) => acc.replace(regex, ''),
-      video.title,
-    ).split('-');
-
-    return {
-      author,
-      title: clreared_original_title[1]?.trim() || null,
-      artist: clreared_original_title[0].trim() || null,
-    };
-  }
-
-  private ytdlCoreSongCheck(video: relatedVideo, skip_title?: boolean) {
-    const checkDuration = (): boolean => {
-      return (
-        video.length_seconds <= this.MAX_SONG_DURATION &&
-        video.length_seconds >= this.MIN_SONG_DURATION
-      );
-    };
-
-    const checkByTitle = (): boolean => {
-      if (skip_title) return true;
-
-      return KEYWOARDS.SONG_TITLE.some((keywoard) =>
-        video.title.includes(keywoard),
-      );
-    };
-
-    return checkDuration() && checkByTitle();
   }
 
   private convertYoutubeIVideo(video: VideoCompact | Video): TSong {
@@ -174,18 +91,16 @@ export class SongSearchService {
     };
   }
 
-  private async searchSongs(
-    query: string,
-    limit: number = 20,
+  private async convertSongs(
+    videos: Video[] | VideoCompact[],
+    limit: number = 15,
   ): Promise<SongEntity[]> {
-    const videos = await this.client.search(query, { type: 'video' });
-
     const songs: SongEntity[] = [];
 
-    for (const [index, video] of videos.items.entries()) {
+    for (const [index, video] of videos.entries()) {
       if (index >= limit) break;
 
-      if (video.isLive) continue;
+      if (video instanceof VideoCompact && video.isLive) continue;
       if (video.id === 'didyoumean') continue;
       if (!this.youtubeISongCheck(video)) continue;
 
