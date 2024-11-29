@@ -2,7 +2,7 @@ import RadioIcon from '@/assets/icons/radio.svg';
 import BannerImg from '@/assets/images/banner.png';
 import ProfileBadge from '@/components/ProfileBadge';
 import SearchField from '@/components/SearchField';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { useLazyGetRandomSongsQuery } from '@/api/song.api';
 import { toast } from 'react-toastify';
@@ -13,6 +13,7 @@ function HomeNavbar() {
   const { playNow } = useAppSelector((state) => state.player);
   const [gerRandomSong] = useLazyGetRandomSongsQuery();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const playRandomSong = async () => {
     try {
@@ -48,9 +49,12 @@ function HomeNavbar() {
       <div className="z-30 relative h-full">
         <div className="flex h-[40px] justify-between">
           <div className="w-[80%] xl:w-1/3">
-            <Link to="/search" className="cursor-text">
+            <div
+              onClick={() => navigate('/search')}
+              className="cursor-pointer h-full"
+            >
               <SearchField />
-            </Link>
+            </div>
           </div>
           <div>
             {user ? (

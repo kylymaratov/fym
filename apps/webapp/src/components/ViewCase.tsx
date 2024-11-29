@@ -6,11 +6,12 @@ import PrevIcon from '@/assets/icons/prev.svg';
 import NextIcon from '@/assets/icons/next.svg';
 import PauseIcon from '@/assets/icons/pause.svg';
 import { ViewCaseTypes, SongTypes } from '@/types/song.types';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import LogoIcon from '@/assets/icons/logo.svg';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { playerActions } from '@/store/slices/player.slice';
 import 'swiper/swiper-bundle.css';
+import { useLazyGetRelatedSongsQuery } from '@/api/song.api';
 
 interface Props {
   data: ViewCaseTypes;
@@ -22,6 +23,8 @@ function ViewCase({ data, more, rounded = 'rounded-lg' }: Props) {
   const player = useAppSelector((state) => state.player);
   const dispatch = useAppDispatch();
   const swiperRef = useRef<SwiperClass | null>(null);
+  const navigate = useNavigate();
+  const [getRelated, relatedSongs] = useLazyGetRelatedSongsQuery();
 
   function playSong(song: SongTypes) {
     if (player.playNow?.song_id === song.song_id) {
@@ -31,6 +34,18 @@ function ViewCase({ data, more, rounded = 'rounded-lg' }: Props) {
         dispatch(playerActions.setPlayingTrigger(false));
       }
     } else {
+      playNewSong(song);
+    }
+  }
+
+  async function playNewSong(song: SongTypes) {
+    try {
+      const data = await getRelated(`?song_id=${song.song_id}`).unwrap();
+
+      dispatch(playerActions.setPlayNow(song));
+      const relatedSongs = data ? data.songs.slice(1, data.songs.length) : [];
+      dispatch(playerActions.setQueue(relatedSongs));
+    } catch {
       dispatch(playerActions.setPlayNow(song));
     }
   }
@@ -76,20 +91,23 @@ function ViewCase({ data, more, rounded = 'rounded-lg' }: Props) {
             className="select-none bg-transparent group overflow-hidden hover:shadow-lg justify-center hover:bg-hover hover:shadow-hover flex items-center"
           >
             <div className="relative">
-              <Link to={`/song/${song.song_id}`}>
+              <img
+                onClick={() =>
+                  navigate(`/song/${song.song_id}`, {
+                    state: { relatedSongs: relatedSongs.data },
+                  })
+                }
+                loading="lazy"
+                src={`https://i.ytimg.com/vi/${song.song_id}/mqdefault.jpg`}
+                className={`cursor-pointer w-[190px] h-[190px] m-auto object-cover duration-200 opacity-70 hover:opacity-100 shadow-sm shadow-gray-500 ${rounded}`}
+              />
+              {rounded !== 'rounded-full' && (
                 <img
-                  loading="lazy"
-                  src={`https://i.ytimg.com/vi/${song.song_id}/mqdefault.jpg`}
-                  className={`w-[190px] h-[190px] m-auto object-cover duration-200 opacity-70 hover:opacity-100 shadow-sm shadow-gray-500 ${rounded}`}
+                  alt="b"
+                  src={LogoIcon}
+                  className="absolute top-5 left-3 opacity-70 w-[30px]"
                 />
-                {rounded !== 'rounded-full' && (
-                  <img
-                    alt="b"
-                    src={LogoIcon}
-                    className="absolute top-5 left-3 opacity-70 w-[30px]"
-                  />
-                )}
-              </Link>
+              )}
 
               <button
                 type="button"

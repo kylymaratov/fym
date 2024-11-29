@@ -2,7 +2,7 @@ import PlayIcon from '@/assets/icons/play.svg';
 import OptionIcon from '@/assets/icons/option.svg';
 import PauseIcon from '@/assets/icons/pause.svg';
 import { ViewCaseTypes, SongTypes } from '@/types/song.types';
- 
+
 import 'swiper/swiper-bundle.css';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { playerActions } from '@/store/slices/player.slice';
@@ -10,13 +10,48 @@ import { useState } from 'react';
 
 interface Props {
   data: ViewCaseTypes;
+  bySong?: boolean;
 }
 
-function ViewTable({ data }: Props) {
+function ViewTable({ data, bySong }: Props) {
+  const dispatch = useAppDispatch();
+
+  const playAll = () => {
+    if (data) {
+      dispatch(playerActions.setPlayNow(data.songs[0]));
+      dispatch(playerActions.setQueue(data.songs.slice(1, data.songs.length)));
+    }
+  };
+
+  if (!data.songs.length)
+    return <div className="text-center">Nothing here</div>;
+
   return (
     <div className="w-full h-full">
-      <h1 className="font-bold text-lg">{data.title}</h1>
-      <table className="mt-6 w-full">
+      <div className="relative">
+        <img
+          src={`https://i.ytimg.com/vi/${data.songs[0].song_id}/mqdefault.jpg`}
+          className="w-full h-[300px] xl:h-[450px] rounded-xl object-cover opacity-10 z-10"
+        />
+        <div className="absolute left-2 xl:left-7 h-full top-0 flex items-center z-20">
+          <div>
+            <h1 className="font-bold text-2xl xl:text-6xl text-gray-300">
+              {data.title}
+            </h1>
+            {bySong && (
+              <h1 className="mt-10">by: {data.songs[0].original_title}</h1>
+            )}
+            <button
+              onClick={playAll}
+              type="button"
+              className="uppercase mt-5 xl:mt-20 ml-1 text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+            >
+              Listen all
+            </button>
+          </div>
+        </div>
+      </div>
+      <table className="mt-6 w-full bg-transparent relative -top-16 z-30">
         <thead>
           <tr>
             <th className="px-1 py-2 text-[13px] text-center font-light">#</th>
@@ -73,7 +108,7 @@ export const SongItem: React.FC<SongItemProps> = ({ song, num }) => {
   return (
     <tr
       key={song.song_id}
-      className="hover:bg-hover h-16 group relative"
+      className="hover:bg-hover h-16 group relative rounded-lg"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
@@ -107,17 +142,14 @@ export const SongItem: React.FC<SongItemProps> = ({ song, num }) => {
         </div>
       </td>
       <td className="px-4 py-2 text-start text-[12px] text-gray-300">
-        {song.upload_date.split('T')[0]}
+        {song.upload_date?.split('T')[0] || ''}
       </td>
       <td className="px-4 py-2 text-center text-[14px] text-gray-300">
         {formatTime(song.duration)}
       </td>
-      <button
-        type="button"
-        className="hidden absolute right-5 top-[50%] -translate-y-[50%] group-hover:block"
-      >
+      <td className="hidden absolute right-3 top-[50%] -translate-y-[50%] group-hover:block">
         <img src={OptionIcon} alt="option" />
-      </button>
+      </td>
     </tr>
   );
 };

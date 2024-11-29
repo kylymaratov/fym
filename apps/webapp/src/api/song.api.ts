@@ -24,6 +24,9 @@ export const songApi = createApi({
     getRandomSongs: builder.query<ViewCaseTypes, string>({
       query: (query: string) => '/song/random' + query,
     }),
+    getRelatedSongs: builder.query<ViewCaseTypes, string>({
+      query: (query: string) => '/song/related' + query,
+    }),
   }),
 });
 
@@ -35,4 +38,6 @@ export const {
   useGetUserLikedSongsQuery,
   useGetRandomSongsQuery,
   useLazyGetRandomSongsQuery,
+  useGetRelatedSongsQuery,
+  useLazyGetRelatedSongsQuery,
 } = songApi;

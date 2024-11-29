@@ -1,5 +1,3 @@
-'use server';
-
 import LogoIcon from '@/assets/images/logo.svg';
 import { useMemo } from 'react';
 import HomeIcon from '@/assets/icons/home.svg';

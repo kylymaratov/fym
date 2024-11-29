@@ -195,12 +195,13 @@ export class SongService {
 
   async getRelatedSongs(song_id: string) {
     try {
+      const song = await this.songDatabaseService.findBySongId(song_id);
       const related_songs =
         await this.songSearchService.getRelatedSongs(song_id);
 
       return {
         title: 'Related songs',
-        songs: related_songs,
+        songs: [song, ...related_songs],
       };
     } catch {
       return { title: 'Related songs', songs: [] };

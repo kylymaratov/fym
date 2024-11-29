@@ -9,6 +9,13 @@ export const Footer = () => {
             Telegram
           </a>
         </p> */}
+        <a
+          href="https://t.me/songfiy"
+          className="text-sm italic text-blue-500"
+          target="_blank"
+        >
+          News channel {'->'}
+        </a>
       </div>
     </div>
   );
