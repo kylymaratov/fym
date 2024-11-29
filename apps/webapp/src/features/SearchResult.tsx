@@ -1,5 +1,5 @@
 import SearchBanner from '@/assets/images/search-banner.png';
-import ShowTable from '@/components/ShowTable';
+import ShowTable from '@/components/ViewTable';
 import { useAppSelector } from '@/store/hooks';
 
 function SearchResult() {

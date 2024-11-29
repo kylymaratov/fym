@@ -49,11 +49,11 @@ export const HomePage = () => {
       },
     ],
     [
-      topSongsByLikes.data,
-      topSongsByAuditions.data,
-      recentlySongs.data,
-      recomendationSongs.data,
-      userLikedSongs.data,
+      topSongsByLikes,
+      topSongsByAuditions,
+      recentlySongs,
+      recomendationSongs,
+      userLikedSongs,
     ],
   );
 
@@ -66,11 +66,17 @@ export const HomePage = () => {
             (item, key) =>
               item.data.data && (
                 <div key={key} className="my-14">
-                  <ViewCase
-                    data={item.data.data}
-                    rounded={item.rounded as 'rounded-full'}
-                    more={item.href}
-                  />
+                  {item.data.error ? (
+                    <p className="text-center text-red-500">
+                      Error while fetch data
+                    </p>
+                  ) : (
+                    <ViewCase
+                      data={item.data.data}
+                      rounded={item.rounded as 'rounded-full'}
+                      more={item.href}
+                    />
+                  )}
                 </div>
               ),
           )}

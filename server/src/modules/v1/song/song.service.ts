@@ -186,8 +186,24 @@ export class SongService {
     const randomSong =
       likedSongs[Math.floor(Math.random() * likedSongs.length)];
 
-    response.songs = await this.songSearchService.getRelatedSongs(randomSong);
+    response.songs = await this.songSearchService.getRelatedSongs(
+      randomSong.song_id,
+    );
 
     return response;
+  }
+
+  async getRelatedSongs(song_id: string) {
+    try {
+      const related_songs =
+        await this.songSearchService.getRelatedSongs(song_id);
+
+      return {
+        title: 'Related songs',
+        songs: related_songs,
+      };
+    } catch {
+      return { title: 'Related songs', songs: [] };
+    }
   }
 }

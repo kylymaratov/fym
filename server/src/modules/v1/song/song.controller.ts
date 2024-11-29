@@ -40,6 +40,12 @@ export class SongController {
     return this.songService.getMoreAuidionsSongs(query.limit);
   }
 
+  @Get('related')
+  @HttpCode(200)
+  getRelatedSongs(@Query() query: { song_id: string }) {
+    return this.songService.getRelatedSongs(query.song_id);
+  }
+
   @Get('random')
   @HttpCode(200)
   getRandomSongs(@Query() query: { limit: number }) {

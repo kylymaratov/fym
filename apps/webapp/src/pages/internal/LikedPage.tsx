@@ -1,5 +1,5 @@
 import LoadingSpinner from '@/components/LoadingSpinner';
-import ShowTable from '@/components/ShowTable';
+import ShowTable from '@/components/ViewTable';
 import { useGetUserLikedSongsQuery } from '@/api/song.api';
 
 export const LikedPage = () => {
@@ -10,7 +10,7 @@ export const LikedPage = () => {
       {userLikedSongs.isLoading ? (
         <LoadingSpinner />
       ) : (
-        userLikedSongs.data && <ShowTable data={userLikedSongs.data} numeric />
+        userLikedSongs.data && <ShowTable data={userLikedSongs.data} />
       )}
     </div>
   );

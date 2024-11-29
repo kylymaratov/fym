@@ -10,18 +10,18 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Songfiy - Online/Offline music app',
-        short_name: 'VitePWA',
-        description: 'A simple PWA app built with Vite',
-        theme_color: '#ffffff',
+        name: 'Songfiy - Online / Offline music app',
+        short_name: 'Songfiy',
+        description: 'Free web app for listen music',
+        theme_color: '#000',
         icons: [
           {
-            src: '/pwa-192x192.png',
+            src: '/logo.png',
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: '/pwa-512x512.png',
+            src: '/logo.png',
             sizes: '512x512',
             type: 'image/png',
           },

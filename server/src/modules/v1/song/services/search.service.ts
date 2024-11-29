@@ -20,8 +20,8 @@ export class SongSearchService {
     @Inject() private convertUtil: ConvertUtil,
   ) {}
 
-  async getRelatedSongs(song: SongEntity): Promise<SongEntity[]> {
-    const songs = await getBasicInfo(URLS.WATCH_YT + song.song_id);
+  async getRelatedSongs(song_id: string): Promise<SongEntity[]> {
+    const songs = await getBasicInfo(URLS.WATCH_YT + song_id);
 
     return await this.convertYtdlCoreVideo(songs.related_videos);
   }
