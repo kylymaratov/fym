@@ -1,5 +1,6 @@
 # compiled output
 /dist
+/apps
 /node_modules
 /build
 /src/database/migrations/
